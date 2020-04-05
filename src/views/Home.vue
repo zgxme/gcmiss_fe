@@ -1,200 +1,45 @@
-<template>
+<template >
   <v-app id="inspire">
+    <v-row>
+      <v-col
+        cols="12"
+        sm="8"
+        justify="center"
+        class="mx-auto"
+      >
+        <v-lazy transition="fade-transition">
+          <v-card
+            class="post-list"
+            tile
+            width="750px"
+          >
+            <v-list
+              two-line
+              subheade
+              :disabled=false
+            >
+              <template v-for="item in post_items">
 
-    <v-content>
-      <v-container fluid>
-        <v-navigation-drawer
-          v-model="drawer"
-          :clipped="$vuetify.breakpoint.lgAndUp"
-          app
-        >
-          <v-list dense>
-            <template v-for="item in items">
-              <v-row
-                v-if="item.heading"
-                :key="item.heading"
-                align="center"
-              >
-                <v-col cols="6">
-                  <v-subheader v-if="item.heading">
-                    {{ item.heading }}
-                  </v-subheader>
-                </v-col>
-                <v-col
-                  cols="6"
-                  class="text-center"
-                >
-                  <a
-                    href="#!"
-                    class="body-2 black--text"
-                  >EDIT</a>
-                </v-col>
-              </v-row>
-              <v-list-group
-                v-else-if="item.children"
-                :key="item.text"
-                v-model="item.model"
-                :prepend-icon="item.model ? item.icon : item['icon-alt']"
-                append-icon=""
-              >
-                <template v-slot:activator>
-                  <v-list-item>
-                    <v-list-item-content>
-                      <v-list-item-title>
-                        {{ item.text }}
-                      </v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item>
-                </template>
                 <v-list-item
-                  v-for="(child, i) in item.children"
-                  :key="i"
-                  link
+                  :key="item.post_id"
+                  v-if="item.post_id"
+                  @click="renderPost(item.post_id)"
                 >
-                  <v-list-item-action v-if="child.icon">
-                    <v-icon>{{ child.icon }}</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      {{ child.text }}
-                    </v-list-item-title>
+                  <v-list-item-avatar>
+                    <v-img :src="item.poster_avatar"></v-img>
+                  </v-list-item-avatar>
+                  <v-list-item-content class="post-list">
+                    <v-list-item-title><span style="font-size:16px">{{item.title}}</span></v-list-item-title>
+                    <v-list-item-subtitle><span style="font-size:14px">{{item.content}}</span></v-list-item-subtitle>
+                    <v-list-item-subtitle><span style="font-size:12px">{{item.post_lable}}</span></v-list-item-subtitle>
                   </v-list-item-content>
                 </v-list-item>
-              </v-list-group>
-              <v-list-item
-                v-else
-                :key="item.text"
-                link
-              >
-                <v-list-item-action>
-                  <v-icon>{{ item.icon }}</v-icon>
-                </v-list-item-action>
-                <v-list-item-content>
-                  <v-list-item-title>
-                    {{ item.text }}
-                  </v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </template>
-          </v-list>
-        </v-navigation-drawer>
-        <v-app-bar
-          :clipped-left="$vuetify.breakpoint.lgAndUp"
-          app
-          color="blue darken-3"
-          dark
-        >
-          <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-          <v-toolbar-title
-            style="width: 300px"
-            class="ml-0 pl-4"
-          >
-            <span class="hidden-sm-and-down">Google Contacts</span>
-          </v-toolbar-title>
-          <v-text-field
-            flat
-            solo-inverted
-            hide-details
-            prepend-inner-icon="mdi-magnify"
-            label="Search"
-            class="hidden-sm-and-down"
-          />
-          <v-spacer />
-          <v-btn icon>
-            <v-icon>mdi-apps</v-icon>
-          </v-btn>
-          <v-btn icon>
-            <v-icon>mdi-bell</v-icon>
-          </v-btn>
-          <v-btn
-            icon
-            large
-          >
-            <v-avatar
-              size="32px"
-              item
-            >
-              <v-img
-                v-bind:src="avatar_url"
-                alt="Vuetify"
-              />
-            </v-avatar>
-          </v-btn>
-        </v-app-bar>
-        <v-row>
-          <v-col
-            cols="12"
-            sm="8"
-            justify="center"
-          >
-            <v-card class="post-list">
-              <v-list three-line>
-                <template v-for="item in post_items">
-                  <v-subheader
-                    v-if="item.header"
-                    :key="item.header"
-                    v-text="item.header"
-                  ></v-subheader>
-
-                  <v-divider
-                    v-else-if="item.divider"
-                    :key="item.post_id"
-                    :inset="item.inset"
-                  ></v-divider>
-
-                  <v-list-item
-                    v-else
-                    :key="item.post_id"
-                  >
-                    <v-list-item-avatar>
-                      <v-img :src="item.poster_avatar"></v-img>
-                    </v-list-item-avatar>
-                    <v-list-item-content>
-                      <v-list-item-title v-text="item.title"></v-list-item-title>
-                      <v-list-item-subtitle v-text="item.content"></v-list-item-subtitle>
-                      <v-list-item-subtitle v-text="item.post_lable"></v-list-item-subtitle>
-                    </v-list-item-content>
-                  </v-list-item>
-                </template>
-              </v-list>
-            </v-card>
-          </v-col>
-        </v-row>
-        <!-- <v-row
-          align="center"
-          justify="center"
-        >
-          <v-tooltip right>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                :href="source"
-                icon
-                large
-                target="_blank"
-                v-on="on"
-              >
-                <v-icon large>mdi-code-tags</v-icon>
-              </v-btn>
-            </template>
-            <span>Source</span>
-          </v-tooltip>
-          <v-tooltip right>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                icon
-                large
-                href="https://codepen.io/johnjleider/pen/MNYLdL"
-                target="_blank"
-                v-on="on"
-              >
-                <v-icon large>mdi-codepen</v-icon>
-              </v-btn>
-            </template>
-            <span>Codepen</span>
-          </v-tooltip>
-        </v-row> -->
-      </v-container>
-    </v-content>
+              </template>
+            </v-list>
+          </v-card>
+        </v-lazy>
+      </v-col>
+    </v-row>
     <v-btn
       bottom
       color="pink"
@@ -294,61 +139,17 @@ export default {
   },
   data: () => ({
     dialog: false,
-    drawer: false,
-    items: [
-      { icon: 'mdi-contacts', text: 'Contacts' },
-      { icon: 'mdi-history', text: 'Frequently contacted' },
-      { icon: 'mdi-content-copy', text: 'Duplicates' },
-      {
-        icon: 'mdi-chevron-up',
-        'icon-alt': 'mdi-chevron-down',
-        text: 'Labels',
-        model: true,
-        children: [
-          { icon: 'mdi-plus', text: 'Create label' }
-        ]
-      },
-      {
-        icon: 'mdi-chevron-up',
-        'icon-alt': 'mdi-chevron-down',
-        text: 'More',
-        model: false,
-        children: [
-          { text: 'Import' },
-          { text: 'Export' },
-          { text: 'Print' },
-          { text: 'Undo changes' },
-          { text: 'Other contacts' }
-        ]
-      },
-      { icon: 'mdi-settings', text: 'Settings' },
-      { icon: 'mdi-message', text: 'Send feedback' },
-      { icon: 'mdi-help-circle', text: 'Help' },
-      { icon: 'mdi-cellphone-link', text: 'App downloads' },
-      { icon: 'mdi-keyboard', text: 'Go to the old version' },
-    ],
-    avatar_url: '',
     post_items: [],
+    REQUIRE: true,
+    loading: false,
+    tips: '努力加载中...',
+    cursor: 10,
+    limit: 20,
+    has_more: true,
   }),
-  mounted: function () {
+  created: function () {
     var _this = this
-    _this.$axios.get('/api/v1/session/get', {}).then(function (res) {
-      // console.log(res)
-      let errno = res.data.errno
-      // console.log(errno)
-      if (errno !== 0) {
-        _this.$router.push({ path: '/login' })
-      }
-    })
-    _this.$axios.get('/api/v1/user/get', {}).then(function (res) {
-      let errno = res.data.errno
-      if (errno !== 0) {
-        console.log(errno)
-      }
-      console.log(res.data.user_info.avatar_url)
-      _this.avatar_url = res.data.user_info.avatar_url
-
-    })
+    //TODO fix sort 
     _this.$axios.get('/api/v1/post/get', {
       params: {
         cursor: 0,
@@ -360,11 +161,67 @@ export default {
       if (errno !== 0) {
         console.log(errno)
       }
-      console.log(res.data.post_list)
-      _this.post_items = res.data.post_list
-
+      _this.cursor = _this.cursor + 10
+      _this.has_more = res.data.has_more
+      // console.log(res.data.post_list)
+      for (let i in res.data.post_list) {
+        _this.post_items.push(res.data.post_list[i])
+      }
+      // console.log(_this.post_items)
 
     })
-  }
+  },
+  methods: {
+    // ...
+    scroll(post_item) {
+      let isLoading = false
+      let _this = this
+      window.onscroll = () => {
+        // 距离底部200px时加载一次
+        let bottomOfWindow = document.documentElement.offsetHeight - document.documentElement.scrollTop - window.innerHeight <= 200
+        if (bottomOfWindow && isLoading === false && _this.has_more === true) {
+          isLoading = true
+          _this.$axios.get('/api/v1/post/get', {
+            params: {
+              cursor: _this.cursor + 10,
+              limit: 10,
+              desc: 1
+            }
+          }).then(response => {
+            _this.cursor += 10
+            // console.log(response.data.post_list)
+            _this.post_items.push(response.data.post_list)
+            for (let i in response.data.post_list) {
+              if (response.data.post_list[i].post_id !== null) {
+                _this.post_items.push(response.data.post_list[i])
+              }
+
+            }
+            if (response.data.has_more === false)
+              _this.has_more = false
+            isLoading = false
+          })
+        }
+      }
+    },
+    renderPost(post_id) {
+      let _this = this
+      _this.$router.push({ path: '/post', query: { id: post_id } })
+    },
+  },
+  mounted() {
+    this.scroll(this.post_items)
+  },
+
+
 }
 </script>
+<style>
+.post-list span {
+  width: 100%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  overflow: hidden;
+}
+</style>

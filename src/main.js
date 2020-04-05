@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2019-12-16 23:20:22
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-03-28 22:26:28
+ * @LastEditTime: 2020-04-05 14:05:32
  */
 import Vue from 'vue'
 import App from './App.vue'
@@ -16,18 +16,37 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
-Vue.config.productionTip = false
+Vue.config.productionTip = true
 axios.defaults.withCredentials = true
-axios.defaults.baseURL = 'http://localhost:8088/'
+axios.defaults.baseURL = 'http://192.168.1.9:8088/'
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 Vue.prototype.$axios = axios
 Vue.prototype.$qs = qs
 // Vue.use(VueResource)
+const opts = {
+  theme: {
+    themes: {
+      light: {
+        primary: '#03a9f4',
+        secondary: '#009688',
+        accent: '#9c27b0',
+        error: '#f44336',
+        warning: '#ff5722',
+        info: '#607d8b',
+        success: '#4caf50'
+      }
+
+    }
+  }
+}
 new Vue({
   VueAxios,
   axios,
   router,
   store,
-  vuetify,
+  vuetify: new Vuetify(opts),
   render: h => h(App)
 }).$mount('#app')
+router.afterEach((to, from, next) => {
+  window.scrollTo(0, 0)
+})
