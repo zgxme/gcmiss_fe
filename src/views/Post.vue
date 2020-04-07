@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-04-05 00:37:35
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-04-05 14:51:26
+ * @LastEditTime: 2020-04-06 18:40:02
  -->
 <template>
   <v-app id="Post">
@@ -35,7 +35,10 @@
                       :disabled=false
                     >
                       <v-list-item class="list-item">
-                        <v-list-item-avatar>
+                        <v-list-item-avatar
+                          @click="renderProfile(post.poster_id)"
+                          style="cursor:pointer"
+                        >
                           <v-img :src="post.poster_avatar"></v-img>
                         </v-list-item-avatar>
                         <v-list-item-content>
@@ -55,6 +58,17 @@
                 </v-card-text>
               </v-card>
             </v-window-item>
+            <v-carousel v-show="image_show">
+              <v-carousel-item
+                v-for="image in post_images"
+                :key="image.image_id"
+                :src="image.image_url"
+                reverse-transition="fade-transition"
+                transition="fade-transition"
+                @click="renderImg(image.image_url)"
+                style="cursor:pointer"
+              ></v-carousel-item>
+            </v-carousel>
           </v-window>
           <v-card flat>
             <v-list
@@ -64,7 +78,10 @@
             >
               <template v-for="comment in comment_list">
                 <v-list-item :key="comment.comment_id">
-                  <v-list-item-avatar>
+                  <v-list-item-avatar
+                    @click="renderProfile(comment.user_from_id)"
+                    style="cursor:pointer"
+                  >
                     <v-img :src="comment.user_from_avatar"></v-img>
                   </v-list-item-avatar>
                   <v-list-item-content class="comment-list">
@@ -105,32 +122,11 @@ export default {
     post: {},
     comment_list: [],
     page: 1,
+    post_images: [],
+    image_show: false,
 
   }),
-  created: function () {
-    var _this = this
-    //TODO fix sort 
-    _this.$axios.get('/api/v1/post/get', {
-      params: {
-        cursor: 0,
-        limit: 20,
-        desc: 1
-      }
-    }).then(function (res) {
-      let errno = res.data.errno
-      if (errno !== 0) {
-        console.log(errno)
-      }
-      _this.cursor = _this.cursor + 10
-      _this.has_more = res.data.has_more
-      // console.log(res.data.post_list)
-      for (let i in res.data.post_list) {
-        _this.post_items.push(res.data.post_list[i])
-      }
-      // console.log(_this.post_items)
 
-    })
-  },
   created: function () {
     let _this = this
     _this.id = _this.$route.query.id
@@ -154,40 +150,22 @@ export default {
       // console.log(_this.post_items)
       _this.post = res.data.post
       _this.comment_list = res.data.comment_list
+      _this.post_images = res.data.image_list
+      if (res.data.image_list !== null) {
+        _this.image_show = true
+      }
     })
   },
   methods: {
-    // ...
-    scroll(post_item) {
-      let isLoading = false
+    renderProfile(user_id) {
       let _this = this
-      window.onscroll = () => {
-        // 距离底部200px时加载一次
-        let bottomOfWindow = document.documentElement.offsetHeight - document.documentElement.scrollTop - window.innerHeight <= 200
-        if (bottomOfWindow && isLoading === false && _this.has_more === true) {
-          isLoading = true
-          _this.$axios.get('/api/v1/post/get', {
-            params: {
-              cursor: _this.cursor + 10,
-              limit: 10,
-              desc: 1
-            }
-          }).then(response => {
-            _this.cursor += 10
-            // console.log(response.data.post_list)
-            _this.post_items.push(response.data.post_list)
-            for (let i in response.data.post_list) {
-              if (response.data.post_list[i].post_id !== null) {
-                _this.post_items.push(response.data.post_list[i])
-              }
-
-            }
-            if (response.data.has_more === false)
-              _this.has_more = false
-            isLoading = false
-          })
-        }
+      if (_this.$router.currentRoute.path !== '/profile' && user_id != 0) {
+        _this.$router.push({ path: '/profile', query: { id: user_id } })
       }
+    },
+    renderImg(url) {
+      // window.open(url, 'target')
+      window.location.href = url
     },
   },
   mounted() {

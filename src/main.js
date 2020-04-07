@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2019-12-16 23:20:22
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-04-05 14:05:32
+ * @LastEditTime: 2020-04-06 22:42:39
  */
 import Vue from 'vue'
 import App from './App.vue'
@@ -42,6 +42,7 @@ const opts = {
 new Vue({
   VueAxios,
   axios,
+  qs,
   router,
   store,
   vuetify: new Vuetify(opts),

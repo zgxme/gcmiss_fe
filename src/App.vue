@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2019-12-16 23:20:22
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-04-05 21:16:09
+ * @LastEditTime: 2020-04-06 18:47:27
  -->
 <template>
   <v-app id="inspire">
@@ -94,7 +94,12 @@
         style="width: 300px"
         class="ml-0 pl-4"
       >
-        <span class="hidden-sm-and-down">Google Contacts</span>
+        <span
+          class="hidden-sm-and-down"
+          @click="renderHome()"
+          style="cursor:pointer"
+        >gcmiss<span style="font-size:8px">工程小秘书v1.0(校园交流、失物招领、二手市场)</span></span>
+
       </v-toolbar-title>
       <v-text-field
         flat
@@ -109,6 +114,7 @@
       <v-switch
         v-model="$vuetify.theme.dark"
         style="padding-top: 30px"
+        color="indigo"
       ></v-switch>
 
       <v-btn icon>

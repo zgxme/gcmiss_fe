@@ -18,7 +18,7 @@
               subheade
               :disabled=false
             >
-              <template v-for="item in post_items">
+              <template v-for="(item,index) in post_items">
 
                 <v-list-item
                   :key="item.post_id"
@@ -34,6 +34,10 @@
                     <v-list-item-subtitle><span style="font-size:12px">{{item.post_lable}}</span></v-list-item-subtitle>
                   </v-list-item-content>
                 </v-list-item>
+                <v-divider
+                  :key="index"
+                  inset
+                ></v-divider>
               </template>
             </v-list>
           </v-card>
@@ -42,7 +46,7 @@
     </v-row>
     <v-btn
       bottom
-      color="pink"
+      color="indigo"
       dark
       fab
       fixed
@@ -56,16 +60,39 @@
       width="800px"
     >
       <v-card>
-        <v-card-title class="grey darken-2">
-          Create contact
+        <v-card-title>
+          发布帖子
         </v-card-title>
+        <v-divider></v-divider>
         <v-container>
           <v-row class="mx-2">
             <v-col
-              class="align-center justify-space-between"
               cols="12"
+              style="padding:0px"
             >
-              <v-row
+              <v-text-field
+                v-model="title"
+                clearable
+                clear-icon="cancel"
+                :rules="rules_title"
+                counter="20"
+                outlined
+                label="一句话描述你遇到的问题或想分享的主题"
+              ></v-text-field>
+            </v-col>
+            <v-col
+              cols="12"
+              style="padding:0px"
+            >
+              <v-textarea
+                v-model="content"
+                clearable
+                clear-icon="cancel"
+                outlined
+                label="输入描述,越详细越好"
+              ></v-textarea>
+            </v-col>
+            <!-- <v-row
                 align="center"
                 class="mr-0"
               >
@@ -103,29 +130,46 @@
                 placeholder="(000) 000 - 0000"
               />
             </v-col>
-            <v-col cols="12">
-              <v-text-field
+            <v-col cols="12"> -->
+            <!-- <v-text-field
                 prepend-icon="notes"
                 placeholder="Notes"
-              />
-            </v-col>
+              /> -->
           </v-row>
         </v-container>
         <v-card-actions>
-          <v-btn
+          <!-- <v-btn
             text
             color="primary"
-          >More</v-btn>
+          >添加图片</v-btn> -->
+
+          <v-file-input
+            :rules="rules"
+            accept="image/png, image/jpeg, image/jpg"
+            placeholder="请添加图片"
+            prepend-icon="mdi-camera"
+            multiple
+            show-size
+            id="uoloadFiles"
+            name="images"
+          > <input
+              type="file"
+              multiple
+            />
+          </v-file-input>
+
           <v-spacer />
           <v-btn
             text
             color="primary"
             @click="dialog = false"
-          >Cancel</v-btn>
+          >取消</v-btn>
           <v-btn
             text
-            @click="dialog = false"
-          >Save</v-btn>
+            color="primary"
+            @click="postInfo()"
+            :disabled="ConfirmationRule()"
+          >发表</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -146,6 +190,14 @@ export default {
     cursor: 10,
     limit: 20,
     has_more: true,
+    rules: [
+      value => !value || value.size < 3145728 || 'Avatar size should be less than 3 MB!',
+    ],
+    rules_title: [v => v.length <= 20 || '字数限制20字'],
+    rules_conetnt: [v => v.length <= 150 || '字数限制20字'],
+    valid: false,
+    title: '',
+    content: '',
   }),
   created: function () {
     var _this = this
@@ -208,12 +260,36 @@ export default {
       let _this = this
       _this.$router.push({ path: '/post', query: { id: post_id } })
     },
+    postInfo() {
+      let _this = this
+      _this.dialog = false
+      let data = new FormData()
+      let files = document.querySelector('input[type=file]').files
+      for (let i in files) {
+        data.append('images', files[i])
+      }
+      // data.append('images')
+      data.append('title', _this.title)
+      data.append('content', _this.content)
+      _this.$axios({
+        url: '/api/v1/post/add',
+        method: 'post',
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        data: data
+      })
+    },
   },
   mounted() {
     this.scroll(this.post_items)
   },
-
-
+  computed: {
+    ConfirmationRule: function () {
+      let _this = this
+      return () => !(_this.title.length <= 20 && _this.title.length > 0 && _this.content.length <= 150 && _this.content.length > 0)
+    }
+  }
 }
 </script>
 <style>
