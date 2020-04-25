@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2019-12-16 23:20:22
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-04-06 18:47:27
+ * @LastEditTime: 2020-04-25 23:41:16
  -->
 <template>
   <v-app id="inspire">
@@ -69,7 +69,7 @@
           <v-list-item
             v-else
             :key="item.text"
-            link
+            link @click="navReq(item.href, item.method)"
           >
             <v-list-item-action>
               <v-icon>{{ item.icon }}</v-icon>
@@ -165,50 +165,95 @@
 <script>
 export default {
   data: () => ({
-    //
     dialog: false,
     drawer: false,
     items: [
-      { icon: 'mdi-contacts', text: 'Contacts' },
-      { icon: 'mdi-history', text: 'Frequently contacted' },
-      { icon: 'mdi-content-copy', text: 'Duplicates' },
-      {
-        icon: 'mdi-chevron-up',
-        'icon-alt': 'mdi-chevron-down',
-        text: 'Labels',
-        model: true,
-        children: [
-          { icon: 'mdi-plus', text: 'Create label' }
-        ]
-      },
-      {
-        icon: 'mdi-chevron-up',
-        'icon-alt': 'mdi-chevron-down',
-        text: 'More',
-        model: false,
-        children: [
-          { text: 'Import' },
-          { text: 'Export' },
-          { text: 'Print' },
-          { text: 'Undo changes' },
-          { text: 'Other contacts' }
-        ]
-      },
-      { icon: 'mdi-settings', text: 'Settings' },
-      { icon: 'mdi-message', text: 'Send feedback' },
-      { icon: 'mdi-help-circle', text: 'Help' },
-      { icon: 'mdi-cellphone-link', text: 'App downloads' },
-      { icon: 'mdi-keyboard', text: 'Go to the old version' },
+      { icon: 'mdi-contacts', text: '校园交流', href: '',method:'communicate'},
+      { icon: 'mdi-widgets', text: '失物招领', href: '', method:'lose'},
+      { icon: 'mdi-gavel', text: '二手市场', href:'', method: 'transaction'},
+      { icon: 'mdi-settings', text: '设置', href:'', method:'setting'},
+      { icon: 'mdi-call-split', text: '注册', href:'/api/v1/user/logout',method:'register'} ,
+      { icon: 'mdi-login', text: '登陆', href:'/api/v1/user/logout',method:'login'} ,
+      { icon: 'mdi-logout', text: '登出', href:'/api/v1/user/logout',method:'logout'} ,
     ],
     avatar_url: '',
     current_id: 0,
   }),
+  methods: {
+    renderHome() {
+      let _this = this
+      if (_this.$router.currentRoute.path !== '/') {
+        _this.$router.push({ path: '/', query: {} })
+      }
+    },
+    renderLogin(){
+      let _this = this
+      if(_this.$router.currentRoute.path !== '/login'){
+        _this.$router.push({ path: '/login' })
+      }
+    },
+    renderProfile() {
+      let _this = this
+      if (_this.$router.currentRoute.path !== '/profile' && _this.current_id != 0) {
+        _this.$router.push({ path: '/profile', query: { id: _this.current_id } })
+      }
+    },
+    renderLose(){
+      let _this = this
+      if (_this.$router.currentRoute.path !== 'lose'){
+        _this.$router.push({ path: '/lose'})
+      }
+    },
+    renderTransaction(){
+      let _this = this
+      if (_this.$router.currentRoute.path !== 'transaction'){
+        _this.$router.push({ path: '/transaction'})
+      }
+    },
+    renderRegister(){
+      let _this = this
+      if (_this.$router.currentRoute.path !== 'register'){
+        _this.$router.push({ path: '/register'})
+      }
+    },
+    navReq(href, method){
+      let _this = this
+      if (method === 'logout'){
+        _this.$axios.post(href, {}).then(function (res) {
+          let errno = res.data.errno
+          if (errno === 0) {
+            _this.renderLogin()
+          }
+        })
+      }
+      if (method === 'setting'){
+        _this.renderProfile()
+      }
+      if (method === 'communicate'){
+        _this.renderHome()
+      }
+      if (method === 'transaction'){
+        _this.renderTransaction()
+      }
+      if (method === 'lose'){
+        _this.renderLose()
+      }
+      if (method === 'login'){
+        _this.renderLogin()
+      }
+      if (method === 'register'){
+        _this.renderRegister()
+      }
+    }
+    
+    
+  },
   created: function () {
     var _this = this
     _this.$axios.get('/api/v1/session/get', {}).then(function (res) {
       let errno = res.data.errno
       if (errno !== 0) {
-        _this.$router.push({ path: '/login' })
+        _this.renderLogin()
       } else {
         _this.$axios.get('/api/v1/user/get', { params: { user_id: 0 } }).then(function (res) {
           let errno = res.data.errno
@@ -222,19 +267,5 @@ export default {
       }
     })
   },
-  methods: {
-    renderHome() {
-      let _this = this
-      if (_this.$router.currentRoute.path !== '/') {
-        _this.$router.push({ path: '/', query: {} })
-      }
-    },
-    renderProfile() {
-      let _this = this
-      if (_this.$router.currentRoute.path !== '/profile' && _this.current_id != 0) {
-        _this.$router.push({ path: '/profile', query: { id: _this.current_id } })
-      }
-    }
-  }
 }
 </script>

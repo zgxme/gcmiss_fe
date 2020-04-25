@@ -56,14 +56,14 @@
               <v-card-actions>
                 <v-spacer />
                 <v-btn
-                  color="primary"
-                  @click="register"
-                >注册账号</v-btn>
-                <v-btn
                   :disabled="!valid"
                   color="primary"
                   @click="login"
                 >立即登陆</v-btn>
+                <v-btn
+                  color="primary"
+                  @click="register"
+                >注册账号</v-btn>
               </v-card-actions>
             </v-card>
           </v-col>

@@ -2,9 +2,9 @@
  * @Descripttion: 
  * @version: 
  * @Author: Zheng Gaoxiong
- * @Date: 2020-04-05 00:37:35
+ * @Date: 2020-04-25 16:06:50
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-04-25 17:01:29
+ * @LastEditTime: 2020-04-25 16:07:35
  -->
 <template>
   <v-app id="Post">
@@ -98,42 +98,7 @@
             </v-list>
           </v-card>
         </v-card>
-        <!-- <v-card
-          tile
-          width="750px"
-        > -->
-        <v-card
-          tile
-          width="750px"
-        >
-        </v-card>
-        <!-- </v-card> -->
       </v-col>
-      <v-col
-        cols="12"
-        sm="8"
-        justify="center"
-        class="mx-auto">
-         <v-card
-          tile
-          width="750px"
-        >
-        <span style="font-size: 14px; padding: 10px">添加一条新回复</span>
-          <v-textarea
-            solo
-            clearable
-            counter
-            name="input-7-4"
-            label=""
-            width="750px"
-          ></v-textarea>
-            <v-btn
-              text
-              color="primary"
-            >回复</v-btn>
-         </v-card>
-       
-        </v-col>
     </v-row>
   </v-app>
 </template>
