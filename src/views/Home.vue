@@ -50,7 +50,26 @@
     >
       <v-icon>mdi-plus</v-icon>
     </v-btn>
-
+    <v-dialog
+        v-model="send_dialog"
+        hide-overlay
+        persistent
+        width="300"
+      >
+        <v-card
+          color="primary"
+          dark
+        >
+          <v-card-text>
+            正在发表中,请稍等
+            <v-progress-linear
+              indeterminate
+              color="white"
+              class="mb-0"
+            ></v-progress-linear>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     <v-dialog
       v-model="dialog"
       width="800px"
@@ -175,6 +194,7 @@ export default {
       ],
     tag_name:'校园交流',
     dialog: false,
+    send_dialog:false,
     post_items: [],
     REQUIRE: true,
     loading: false,
@@ -198,6 +218,13 @@ export default {
     picValue: {},
     filelist: [],
   }),
+  watch: {
+    send_dialog (val) {
+      if (!val) return
+
+      setTimeout(() => (this.send_dialog = false), 4000)
+    },
+  },
   created: function () {
     var _this = this
     //TODO fix sort 
@@ -317,6 +344,7 @@ export default {
       let _this = this
       _this.dialog = false
       console.log(_this.filelist)
+      _this.send_dialog = true
       setTimeout(function (){
         for (let i = 0; i < _this.filelist.length; i++) {
             formData.append("images", _this.filelist[i])

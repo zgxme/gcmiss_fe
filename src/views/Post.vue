@@ -4,10 +4,11 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-04-05 00:37:35
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-04 11:04:51
+ * @LastEditTime: 2020-05-05 02:46:43
  -->
 <template>
   <v-app id="Post">
+
     <v-row>
       <v-col
         cols="12"
@@ -192,7 +193,8 @@ export default {
     user_for: 0,
     comment_title:"",
     can_delete:false,
-    can_edit:false
+    can_edit:false,
+    
     
 
   }),

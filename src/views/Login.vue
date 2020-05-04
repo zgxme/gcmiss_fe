@@ -1,5 +1,36 @@
 <template>
   <v-app id="inspire">
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="timeout"
+      :color="colorValue"
+      :label="colorValue"
+      :value="colorValue"
+    >
+      {{ text }}
+      <v-btn
+        text
+        @click="snackbar = false"
+      >
+        我知道了
+      </v-btn>
+    </v-snackbar>
+
+    <v-snackbar
+      v-model="snackbar_err"
+      :timeout="timeout"
+      :color="colorValue"
+      :label="colorValue"
+      :value="colorValue"
+    >
+      {{ text_err}}
+      <v-btn
+        text
+        @click="snackbar_err = false"
+      >
+        我知道了
+      </v-btn>
+    </v-snackbar>
     <v-content>
       <v-container fluid>
         <v-row
@@ -36,7 +67,6 @@
                     type="text"
                     required
                     v-model="nickname"
-                    hint="用户名不能大于20位"
                   />
 
                   <v-text-field
@@ -48,7 +78,6 @@
                     type="password"
                     required
                     v-model="password"
-                    hint="密码不能少于6位"
                   />
 
                 </v-form>
@@ -88,14 +117,20 @@ export default {
       invalid: '',
       valid: true,
       lazy: false,
+      snackbar: false,
+      snackbar_err: false,
+      text: '请输入正确的用户名或激活当前账号',
+      text_err: '请输入正确的密码',
+      timeout: 2000,
+      colorValue:'red lighten-2',
       rules: {
         nameRules: [
-          v => !!v || '用户名不为空',
-          v => (v && v.length <= 20) || '用户名不能大于20位'
+          v => (v.length <= 20 && v.length >= 5 ) || '用户名不能大于20位或小于5位且不含空格',
+          v => (v.split(" ").join("").length === v.length ) || '用户名不能含空格',
         ],
         passwordRules: [
-          v => !!v || '密码不为空',
-          v => (v && v.length >= 6) || '密码不能少于6位'
+          v => (v.length <= 20 && v.length >= 5 ) || '密码不能大于20位或小于5位且不含空格',
+          v => (v.split(" ").join("").length === v.length ) || '密码不能含空格',
         ],
         confirmPasswordRules: [
           v => !!v || '密码不为空'
@@ -107,14 +142,30 @@ export default {
       }
     }),
   methods: {
+    set_login_not_exist: function(){
+      let _this = this
+      _this.snackbar = true
+    },
+    set_login_err: function(){
+      let _this = this
+      _this.snackbar_err = true
+    },
     login: function () {
       // console.log(this.nickname, this.email)
       let _this = this
       _this.$axios.post('/api/v1/user/login',
         { 'nickname': this.nickname, 'password': this.password }
       ).then(function (res) {
-        let errmsg = res.data.errmsg
+        let errno = res.data.errno
+        if (errno  === 4004){
+          _this.set_login_not_exist()
+          
+        }else if(errno === 4002){
+          _this.set_login_err()
+        }
+        else{
         _this.$router.push({ path: '/',})
+        }
       })
     },
     register: function () {

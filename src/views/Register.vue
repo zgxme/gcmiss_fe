@@ -1,5 +1,36 @@
 <template>
   <v-app id="inspire">
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="timeout"
+      :color="colorValue"
+      :label="colorValue"
+      :value="colorValue"
+    >
+      {{ text }}
+      <v-btn
+        text
+        @click="snackbar = false"
+      >
+        我知道了
+      </v-btn>
+    </v-snackbar>
+
+    <v-snackbar
+      v-model="snackbar_err"
+      :timeout="timeout"
+      :color="colorValue"
+      :label="colorValue"
+      :value="colorValue"
+    >
+      {{ text_err}}
+      <v-btn
+        text
+        @click="snackbar_err = false"
+      >
+        我知道了
+      </v-btn>
+    </v-snackbar>
     <v-content>
       <v-container fluid>
         <v-row
@@ -36,7 +67,6 @@
                     type="text"
                     required
                     v-model="nickname"
-                    hint="用户名不能大于20位"
                   />
 
                   <v-text-field
@@ -48,13 +78,12 @@
                     type="password"
                     required
                     v-model="password"
-                    hint="密码不能少于6位"
                   />
                   <v-text-field
                     id="confirmPassword"
                     label="请重复输入密码"
                     name="confirmPassword"
-                    :rules="[rules.confirmPasswordRules,passwordConfirmationRule]"
+                    :rules="[passwordConfirmationRule]"
                     prepend-icon="lock"
                     type="password"
                     required
@@ -109,17 +138,24 @@ export default {
       invalid: '',
       valid: true,
       lazy: false,
+      snackbar: false,
+      snackbar_err: false,
+      text: '该用户名已经被注册',
+      text_err: '该邮箱已经被注册',
+      timeout: 2000,
+      colorValue:'red lighten-2',
       rules: {
         nameRules: [
-          v => !!v || '用户名不为空',
-          v => (v && v.length <= 20) || '用户名不能大于20位'
+          v => (v.length <= 20 && v.length >= 5 ) || '用户名不能大于20位或小于5位且不含空格',
+          v => (v.split(" ").join("").length === v.length ) || '用户名不能含空格',
         ],
         passwordRules: [
-          v => !!v || '密码不为空',
-          v => (v && v.length >= 6) || '密码不能少于6位'
+          v => (v.length <= 20 && v.length >= 5 ) || '密码不能大于20位或小于5位且不含空格',
+          v => (v.split(" ").join("").length === v.length ) || '密码不能含空格',
         ],
         confirmPasswordRules: [
-          v => !!v || '密码不为空'
+          v => (v.length <= 20 && v.length >= 5 ) || '密码不能大于20位或小于5位且不含空格',
+          v => (v.split(" ").join("").length === v.length ) || '密码不能含空格',
         ],
         emailRules: [
           v => !!v || '邮箱不为空',
@@ -128,6 +164,14 @@ export default {
       }
     }),
   methods: {
+    set_login_name_exist: function(){
+      let _this = this
+      _this.snackbar = true
+    },
+    set_login_email_exist: function(){
+      let _this = this
+      _this.snackbar_err = true
+    },
     login: function () {
       let _this = this
       _this.$router.push('/login')
@@ -139,9 +183,16 @@ export default {
         { 'nickname': this.nickname, 'password': this.password, 'email':this.email}
       ).then(function (res) {
         let errmsg = res.data.errmsg
-        if (errmsg === 'success') {
-          // console.log('注册成功')
+        let errno = res.data.errno
+        if (errno === 4003){
+          _this.set_login_name_exist()
+          
+        }else if(errno === 4007){
+          _this.set_login_email_exist()
+        }
+        else{
           _this.$router.push({ path: '/login' })
+
         }
       })
     },
