@@ -136,7 +136,7 @@ export default {
       // console.log(this.nickname, this.email)
       var _this = this
       _this.$axios.post('/api/v1/user/register',
-        { 'nickname': this.nickname, 'password': this.password }
+        { 'nickname': this.nickname, 'password': this.password, 'email':this.email}
       ).then(function (res) {
         let errmsg = res.data.errmsg
         if (errmsg === 'success') {

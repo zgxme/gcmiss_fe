@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-04-25 22:11:14
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-04-25 22:11:43
+ * @LastEditTime: 2020-05-03 10:01:51
  -->
 <template >
   <v-app id="inspire">
@@ -230,7 +230,8 @@ export default {
       params: {
         cursor: 0,
         limit: 20,
-        desc: 1
+        desc: 1,
+        tag: 0
       }
     }).then(function (res) {
       let errno = res.data.errno
@@ -258,7 +259,8 @@ export default {
             params: {
               cursor: _this.cursor,
               limit: _this.limit,
-              desc: 1
+              desc: 1,
+              tag: 0,
             }
           }).then(response => {
             _this.cursor = _this.cursor + _this.limit
@@ -290,7 +292,8 @@ export default {
         params: {
           cursor: 0,
           limit: 20,
-          desc: 1
+          desc: 1,
+          tag: 0,
         }
       }).then(function (res) {
         let errno = res.data.errno

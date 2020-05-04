@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2019-12-16 23:20:22
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-04-25 22:25:32
+ * @LastEditTime: 2020-05-04 09:15:16
  */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
@@ -16,6 +16,7 @@ import Profile from '../views/Profile'
 import NoFound from '../views/404.vue'
 import Lose from '../views/Lose.vue'
 import Transaction from '../views/Transaction.vue'
+import Router from 'vue-router'
 Vue.use(VueRouter)
 
 const routes = [
@@ -37,3 +38,8 @@ const router = new VueRouter({
 })
 
 export default router
+
+const routerPush = Router.prototype.push
+Router.prototype.push = function push(location) {
+  return routerPush.call(this, location).catch(error => error)
+}

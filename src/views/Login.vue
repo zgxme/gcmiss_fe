@@ -114,10 +114,7 @@ export default {
         { 'nickname': this.nickname, 'password': this.password }
       ).then(function (res) {
         let errmsg = res.data.errmsg
-        if (errmsg === 'success') {
-          // console.log('登陆成功')
-          _this.$router.push({ path: '/' })
-        }
+        _this.$router.push({ path: '/',})
       })
     },
     register: function () {

@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-04-25 16:06:50
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-04-25 16:07:35
+ * @LastEditTime: 2020-05-04 09:10:33
  -->
 <template>
   <v-app id="Post">
@@ -159,7 +159,7 @@ export default {
   methods: {
     renderProfile(user_id) {
       let _this = this
-      if (_this.$router.currentRoute.path !== '/profile' && user_id != 0) {
+      if (user_id != 0) {
         _this.$router.push({ path: '/profile', query: { id: user_id } })
       }
     },

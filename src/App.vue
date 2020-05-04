@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2019-12-16 23:20:22
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-04-25 23:41:16
+ * @LastEditTime: 2020-05-04 10:26:26
  -->
 <template>
   <v-app id="inspire">
@@ -110,7 +110,7 @@
         class="hidden-sm-and-down"
       />
       <v-spacer />
-
+      dark
       <v-switch
         v-model="$vuetify.theme.dark"
         style="padding-top: 30px"
@@ -154,9 +154,7 @@
     </v-content>
 
     <v-footer app>
-      <div>
         <span style="font-size:10px">2020 Copyright. All Rights Reserved. :) purifiedzheng@gmail.com</span>
-      </div>
     </v-footer>
   </v-app>
 
@@ -168,18 +166,29 @@ export default {
     dialog: false,
     drawer: false,
     items: [
-      { icon: 'mdi-contacts', text: '校园交流', href: '',method:'communicate'},
-      { icon: 'mdi-widgets', text: '失物招领', href: '', method:'lose'},
-      { icon: 'mdi-gavel', text: '二手市场', href:'', method: 'transaction'},
-      { icon: 'mdi-settings', text: '设置', href:'', method:'setting'},
-      { icon: 'mdi-call-split', text: '注册', href:'/api/v1/user/logout',method:'register'} ,
-      { icon: 'mdi-login', text: '登陆', href:'/api/v1/user/logout',method:'login'} ,
-      { icon: 'mdi-logout', text: '登出', href:'/api/v1/user/logout',method:'logout'} ,
+      { icon: '', text: '首页', href: '', method:'index'},
+      { icon: '', text: '校园交流', href: '',method:'communicate'},
+      { icon: '', text: '失物招领', href: '', method:'lose'},
+      { icon: '', text: '二手市场', href:'', method: 'transaction'},
+      { icon: '', text: '设置', href:'', method:'setting'},
+      { icon: '', text: '注册', href:'/api/v1/user/logout',method:'register'} ,
+      { icon: '', text: '登陆', href:'/api/v1/user/logout',method:'login'} ,
+      { icon: '', text: '登出', href:'/api/v1/user/logout',method:'logout'} ,
     ],
     avatar_url: '',
     current_id: 0,
   }),
   methods: {
+    getUser(){
+      let _this = this
+      this.$axios.get('/api/v1/user/get', { params: { user_id: 0 } }).then(function (res) {
+        let errno = res.data.errno
+          console.log(res.data.user_info)
+          _this.avatar_url = res.data.user_info.avatar_url
+          _this.current_id = res.data.user_info.current_id
+          return _this.avatar_url
+       })  
+    },
     renderHome() {
       let _this = this
       if (_this.$router.currentRoute.path !== '/') {
@@ -194,7 +203,8 @@ export default {
     },
     renderProfile() {
       let _this = this
-      if (_this.$router.currentRoute.path !== '/profile' && _this.current_id != 0) {
+      if (_this.current_id != 0) {
+        console.log(_this.current_id)
         _this.$router.push({ path: '/profile', query: { id: _this.current_id } })
       }
     },
@@ -223,6 +233,8 @@ export default {
           let errno = res.data.errno
           if (errno === 0) {
             _this.renderLogin()
+            _this.user_id = 0
+            _this.avatar_url = ''
           }
         })
       }
@@ -248,24 +260,11 @@ export default {
     
     
   },
-  created: function () {
-    var _this = this
-    _this.$axios.get('/api/v1/session/get', {}).then(function (res) {
-      let errno = res.data.errno
-      if (errno !== 0) {
-        _this.renderLogin()
-      } else {
-        _this.$axios.get('/api/v1/user/get', { params: { user_id: 0 } }).then(function (res) {
-          let errno = res.data.errno
-          if (errno !== 0) {
-            console.log(errno)
-          }
-          _this.current_id = res.data.user_info.user_id
-          _this.avatar_url = res.data.user_info.avatar_url
-
-        })
-      }
-    })
+  created(){
+    let avatar_url = this.getUser()
+    // console.log(user)
+    this.avatar_url = avatar_url
   },
+    
 }
 </script>
