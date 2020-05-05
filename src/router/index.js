@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2019-12-16 23:20:22
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-04 09:15:16
+ * @LastEditTime: 2020-05-05 15:24:29
  */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
@@ -16,7 +16,9 @@ import Profile from '../views/Profile'
 import NoFound from '../views/404.vue'
 import Lose from '../views/Lose.vue'
 import Transaction from '../views/Transaction.vue'
+import Active from '../views/Active.vue'
 import Router from 'vue-router'
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -27,6 +29,7 @@ const routes = [
   { path: '/profile', name: 'profile', component: Profile },
   { path: '/lose', name: 'lose', component: Lose},
   { path: '/transaction', name: 'transaction', component: Transaction},
+  { path: '/active', name: 'active', component: Active},
   { path: '/404', component: NoFound },
   { path: '*', redirect: '/404' },
 ]
