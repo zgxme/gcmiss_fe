@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-04-05 14:18:07
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-04-05 23:35:05
+ * @LastEditTime: 2020-05-05 23:50:21
  -->
 <template>
   <v-app id="Profile">
@@ -73,14 +73,14 @@ export default {
     _this.$axios.get('/api/v1/user/get', { params: { user_id: _this.id } }).then(function (res) {
       let errno = res.data.errno
       if (errno !== 0) {
-        console.log(errno)
+        // console.log(errno)
       }
       _this.user_info = res.data.user_info
     })
     _this.$axios.get('/api/v1/user/profile/get', { params: { user_id: _this.id } }).then(function (res) {
       let errno = res.data.errno
       if (errno !== 0) {
-        console.log(errno)
+        // console.log(errno)
       }
       _this.profile_info = res.data.profile_info
     })

@@ -228,6 +228,7 @@ export default {
   created: function () {
     var _this = this
     //TODO fix sort 
+    _this.getUser()
     _this.$axios.get('/api/v1/post/get', {
       params: {
         cursor: 0,
@@ -248,6 +249,22 @@ export default {
   },
   methods: {
     // ...
+    set_avatar(value){
+      this.$store.commit('set_avatar',value)
+    },
+    set_current_id(value){
+      this.$store.commit('set_current_id',value)
+    },
+    getUser(){
+      let _this = this
+      this.$axios.get('/api/v1/user/get', { params: { user_id: 0 } }).then(function (res) {
+        let errno = res.data.errno
+          console.log(res.data.user_info)
+          _this.current_id = res.data.user_info.current_id
+          _this.set_avatar(res.data.user_info.avatar_url)
+          _this.set_current_id(res.data.user_info.user_id)
+       })  
+    },
     async view_change(){
       this.filelist = []
       const files = document.getElementById('demo').files;
@@ -349,7 +366,7 @@ export default {
         for (let i = 0; i < _this.filelist.length; i++) {
             formData.append("images", _this.filelist[i])
         }
-      },"3000");
+      },"2900");
       
       formData.append('title', _this.title)
       formData.append('content', _this.content)
@@ -366,7 +383,7 @@ export default {
       }).then((response) => {
         _this.InitData()
       })
-      },"3500");
+      },"3000");
     },
     mounted() {
       this.scroll(this.post_items)

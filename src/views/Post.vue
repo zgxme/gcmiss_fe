@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-04-05 00:37:35
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-05 02:46:43
+ * @LastEditTime: 2020-05-05 23:38:50
  -->
 <template>
   <v-app id="Post">
@@ -54,7 +54,7 @@
                     <v-spacer></v-spacer>
                   </v-row>
 
-                  <p style="font-size:15px">{{post.content}}</p>
+                  <p style="font-size:15px;white-space: pre-wrap;">{{post.content}}</p>
 
                 </v-card-text>
                  <div

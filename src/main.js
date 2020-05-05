@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2019-12-16 23:20:22
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-03 18:41:07
+ * @LastEditTime: 2020-05-05 23:11:18
  */
 import Vue from 'vue'
 import App from './App.vue'
@@ -15,6 +15,7 @@ import VueAxios from 'vue-axios'
 import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
+
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 Vue.config.productionTip = true
 axios.defaults.withCredentials = true
