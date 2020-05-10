@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2019-12-16 23:20:22
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-05 23:11:18
+ * @LastEditTime: 2020-05-10 18:57:06
  */
 import Vue from 'vue'
 import App from './App.vue'
@@ -20,7 +20,7 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css'
 Vue.config.productionTip = true
 axios.defaults.withCredentials = true
 // axios.defaults.baseURL = 'http://39.105.160.133:80/'
-axios.defaults.baseURL = 'http://192.168.1.9:8088/'
+axios.defaults.baseURL = 'http://192.168.1.9:8080/'
 
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 Vue.prototype.$axios = axios

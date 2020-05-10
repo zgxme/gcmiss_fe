@@ -251,7 +251,7 @@ export default {
         cursor: 0,
         limit: 20,
         desc: 1,
-        tag: 5
+        tag: 3
       }
     }).then(function (res) {
       let errno = res.data.errno
@@ -309,22 +309,19 @@ export default {
       await this.filelist.push(res)
     },
     scroll(post_item) {
-      console.log("sss")
       let isLoading = false
       let _this = this
       window.onscroll = () => {
         // 距离底部200px时加载一次
         let bottomOfWindow = document.documentElement.offsetHeight - document.documentElement.scrollTop - window.innerHeight <= 200
-        console.log("height",bottomOfWindow)
         if (bottomOfWindow && isLoading === false && _this.has_more === true) {
-          console.log("test")
           isLoading = true
           _this.$axios.get('/api/v1/post/get', {
             params: {
               cursor: _this.cursor,
               limit: _this.limit,
               desc: 1,
-              tag:5
+              tag:3
             }
           }).then(response => {
             _this.cursor = _this.cursor + _this.limit
@@ -357,7 +354,7 @@ export default {
           cursor: 0,
           limit: 20,
           desc: 1,
-          tag: 5
+          tag: 3
         }
       }).then(function (res) {
         let errno = res.data.errno
@@ -425,9 +422,9 @@ export default {
         _this.dialog = !_this.dialog
       }
     },
-    
+   
   },
-  mounted() {
+   mounted() {
       this.scroll(this.post_items)
     },
 }

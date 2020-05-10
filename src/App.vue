@@ -4,10 +4,25 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2019-12-16 23:20:22
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-05 23:54:00
+ * @LastEditTime: 2020-05-10 19:01:49
  -->
 <template>
   <v-app id="inspire">
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="timeout"
+      :color="colorValue"
+      :label="colorValue"
+      :value="colorValue"
+    >
+      {{ text }}
+      <v-btn
+        text
+        @click="snackbar = false"
+      >
+        我知道了
+      </v-btn>
+    </v-snackbar>
     <v-navigation-drawer
       v-model="drawer"
       app
@@ -134,7 +149,7 @@
         <v-avatar
           size="32px"
           item
-          @click="renderProfile()"
+          @click="renderMine()"
         >
           <v-img
             v-bind:src="$store.state.avatar_url"
@@ -165,10 +180,16 @@ export default {
   data: () => ({
     dialog: false,
     drawer: false,
+    snackbar: false,
+    text: '请登陆后才能查看个人主页',
+    timeout: 2000,
+    colorValue:'red lighten-2',
     items: [
       { icon: '', text: '首页', href: '', method:'index'},
       { icon: '', text: '校园交流', href: '',method:'communicate'},
       { icon: '', text: '失物招领', href: '', method:'lose'},
+      { icon: '', text: '寻物启事', href: '', method:'find'},
+      { icon: '', text: '求人办事', href: '', method:'help'},
       { icon: '', text: '二手市场', href:'', method: 'transaction'},
       { icon: '', text: '设置', href:'', method:'setting'},
       { icon: '', text: '注册', href:'/api/v1/user/logout',method:'register'} ,
@@ -189,11 +210,9 @@ export default {
       let _this = this
       this.$axios.get('/api/v1/user/get', { params: { user_id: 0 } }).then(function (res) {
         let errno = res.data.errno
-          console.log(res.data.user_info)
           _this.current_id = res.data.user_info.current_id
           _this.set_avatar(res.data.user_info.avatar_url)
           _this.set_current_id(res.data.user_info.user_id)
-          console.log("app.vue")
        })  
     },
     renderHome() {
@@ -211,7 +230,6 @@ export default {
     renderProfile() {
       let _this = this
       if (_this.$store.state.current_id != 0) {
-        console.log(this.$store.state.current_id)
         _this.$router.push({ path: '/profile', query: { id: _this.$store.state.current_id } })
       }
     },
@@ -233,6 +251,42 @@ export default {
         _this.$router.push({ path: '/register'})
       }
     },
+    set_auth_not_exist(){
+      let _this = this
+      _this.snackbar = true
+    },
+    renderMine(){
+      let _this = this
+       if (_this.$store.state.current_id === 0){
+        _this.set_auth_not_exist()
+      }else if (_this.$router.currentRoute.path !== 'mine'){
+        _this.$router.push({ path:'/mine'})
+      }
+    },
+    renderComm(){
+      let _this = this
+       if (_this.$store.state.current_id === 0){
+        _this.set_auth_not_exist()
+      }else if (_this.$router.currentRoute.path !== 'communicate'){
+        _this.$router.push({ path:'/communicate'})
+      }
+    },
+    renderFind(){
+       let _this = this
+       if (_this.$store.state.current_id === 0){
+        _this.set_auth_not_exist()
+      }else if (_this.$router.currentRoute.path !== 'find'){
+        _this.$router.push({ path:'/find'})
+      }
+    },
+    renderHelp(){
+      let _this = this
+       if (_this.$store.state.current_id === 0){
+        _this.set_auth_not_exist()
+      }else if (_this.$router.currentRoute.path !== 'help'){
+        _this.$router.push({ path:'/help'})
+      }
+    },
     navReq(href, method){
       let _this = this
       if (method === 'logout'){
@@ -246,10 +300,10 @@ export default {
         })
       }
       if (method === 'setting'){
-        _this.renderProfile()
+        _this.renderMine()
       }
       if (method === 'communicate'){
-        _this.renderHome()
+        _this.renderComm()
       }
       if (method === 'transaction'){
         _this.renderTransaction()
@@ -262,6 +316,15 @@ export default {
       }
       if (method === 'register'){
         _this.renderRegister()
+      }
+      if (method === 'index'){
+        _this.renderHome()
+      }
+      if (method === 'find'){
+        _this.renderFind()
+      }
+      if (method === 'help'){
+        _this.renderHelp()
       }
     }
     

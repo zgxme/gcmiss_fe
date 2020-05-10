@@ -4,30 +4,10 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-04-05 14:18:07
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-10 16:10:32
+ * @LastEditTime: 2020-05-10 15:21:50
  -->
 <template>
   <v-app id="Profile">
-    <v-dialog
-        v-model="send_dialog"
-        hide-overlay
-        persistent
-        width="300"
-      >
-        <v-card
-          color="primary"
-          dark
-        >
-          <v-card-text>
-            正在修改中,请稍后
-            <v-progress-linear
-              indeterminate
-              color="white"
-              class="mb-0"
-            ></v-progress-linear>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
     <v-row>
       <v-col
         cols="12"
@@ -336,7 +316,7 @@ export default {
   }),
   created: function () {
     var _this = this
-    _this.id = _this.$route.query.id
+    _this.id = _this.$store.state.current_id
     _this.$axios.get('/api/v1/user/get', { params: { user_id: _this.id } }).then(function (res) {
       let errno = res.data.errno
       if (errno !== 0) {
@@ -359,18 +339,10 @@ export default {
   editProfile: function(){
     
   },
-  watch: {
-    send_dialog (val) {
-      if (!val) return
-
-      setTimeout(() => (this.send_dialog = false), 2500)
-    },
-  },
   methods:{
     InitData() {
       var _this = this
-      _this.filelist = []
-      _this.id = _this.$route.query.id
+      _this.id = _this.$store.state.current_id
       _this.$axios.get('/api/v1/user/get', { params: { user_id: _this.id } }).then(function (res) {
         let errno = res.data.errno
         if (errno !== 0) {
@@ -403,7 +375,7 @@ export default {
         promiseList.push(new Promise((resolve, reject) => {
           setTimeout(() => {
             this.view(files[i])
-          }, Math.random() * 2000);
+          }, Math.random() * 3000);
         }));
       }
       Promise.all(promiseList).then((rspList) => {
@@ -414,7 +386,7 @@ export default {
       if (typeof file === 'undefined') {
         return
       }
-      const res = await compressAccurately(file, 100)
+      const res = await compressAccurately(file, 200)
       await this.filelist.push(res)
     },
     postInfo() {
@@ -426,7 +398,7 @@ export default {
       _this.send_dialog = true
       setTimeout(function (){
         formData.append("avatar", _this.filelist[0])
-      },"1900");
+      },"1000");
       
       formData.append('name', _this.realname)
       formData.append('stu_id', _this.stu_num)
@@ -452,7 +424,7 @@ export default {
           _this.InitData()
         }
       })
-      },"2000");
+      },"1200");
       
       _this.$refs.form.reset()
       _this.$refs.form.resetValidation()

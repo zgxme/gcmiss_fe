@@ -1,13 +1,20 @@
-<!--
- * @Descripttion: 
- * @version: 
- * @Author: Zheng Gaoxiong
- * @Date: 2020-04-25 22:11:14
- * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-03 10:01:51
- -->
 <template >
   <v-app id="inspire">
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="timeout"
+      :color="colorValue"
+      :label="colorValue"
+      :value="colorValue"
+    >
+      {{ text }}
+      <v-btn
+        text
+        @click="snackbar = false"
+      >
+        我知道了
+      </v-btn>
+    </v-snackbar>
     <v-row>
       <v-col
         cols="12"
@@ -41,10 +48,6 @@
                     <v-list-item-subtitle><span style="font-size:12px">{{item.post_lable}}</span></v-list-item-subtitle>
                   </v-list-item-content>
                 </v-list-item>
-                <!-- <v-divider
-                  :key="index"
-                  inset
-                ></v-divider> -->
               </template>
             </v-list>
           </v-card>
@@ -58,18 +61,36 @@
       fab
       fixed
       right
-      @click="dialog = !dialog"
+      @click="pre_send"
     >
       <v-icon>mdi-plus</v-icon>
     </v-btn>
-
+    <v-dialog
+        v-model="send_dialog"
+        hide-overlay
+        persistent
+        width="300"
+      >
+        <v-card
+          color="primary"
+          dark
+        >
+          <v-card-text>
+            正在发表中,请稍等
+            <v-progress-linear
+              indeterminate
+              color="white"
+              class="mb-0"
+            ></v-progress-linear>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     <v-dialog
       v-model="dialog"
       width="800px"
     >
-      <v-form v-model="valid">
+      <v-form v-model="valid" ref="form">
         <v-card>
-
           <v-card-title>
             发布帖子
           </v-card-title>
@@ -86,7 +107,7 @@
                   clear-icon="cancel"
                   :rules="rules_title"
                   counter="20"
-                  outlined
+                  outlined=""
                   label="一句话描述你遇到的问题或想分享的主题"
                 ></v-text-field>
               </v-col>
@@ -99,61 +120,41 @@
                   :rules="rules_conetnt"
                   clearable
                   clear-icon="cancel"
-                  outlined
+                  solo=""
                   label="输入描述,越详细越好"
                   height="350px"
                 ></v-textarea>
               </v-col>
-              <!-- <v-row
-                align="center"
-                class="mr-0"
-              >
-                <v-avatar
-                  size="40px"
-                  class="mx-3"
-                >
-                  <img
-                    src="//ssl.gstatic.com/s2/oz/images/sge/grey_silhouette.png"
-                    alt=""
-                  >
-                </v-avatar>
-                <v-text-field placeholder="Name" />
-              </v-row>
-            </v-col>
-            <v-col cols="6">
-              <v-text-field
-                prepend-icon="business"
-                placeholder="Company"
-              />
-            </v-col>
-            <v-col cols="6">
-              <v-text-field placeholder="Job title" />
-            </v-col>
-            <v-col cols="12">
-              <v-text-field
-                prepend-icon="mail"
-                placeholder="Email"
-              />
-            </v-col>
-            <v-col cols="12">
-              <v-text-field
-                type="tel"
-                prepend-icon="phone"
-                placeholder="(000) 000 - 0000"
-              />
-            </v-col>
-            <v-col cols="12"> -->
-              <!-- <v-text-field
-                prepend-icon="notes"
-                placeholder="Notes"
-              /> -->
+              <div class="text-center">
+                <v-menu offset-y>
+                  <template v-slot:activator="{ on }">
+                    <span style="font-size: 14px; color: rgba(0, 0, 0, 0.6);">
+                    标签
+                    </span>
+                    <v-btn
+                      dark
+                      v-on="on"
+                      text
+                      color="primary"
+                      
+                    >
+                    <span>{{tag_name}}</span>
+                    </v-btn>
+                  </template>
+                  <v-list>
+                    <v-list-item
+                      v-for="(item, index) in items"
+                      :key="index"
+                      @click="setTag(index)"
+                    >
+                      <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </div>
             </v-row>
           </v-container>
           <v-card-actions>
-            <!-- <v-btn
-            text
-            color="primary"
-          >添加图片</v-btn> -->
 
             <v-file-input
               :rules="rules"
@@ -163,14 +164,11 @@
               multiple
               counter
               show-size
-              id="uoloadFiles"
+              id="demo"
               name="images"
+              @change="(e) => view_change()"
             >
-            <input
-              type="file"
-              multiple
-              @change="upfile($event)"
-            >
+
             </v-file-input>
 
             <v-spacer />
@@ -192,28 +190,38 @@
     </v-dialog>
   </v-app>
 </template>
-    
+
 <script>
+import { compress, compressAccurately } from 'image-conversion';
 export default {
   props: {
     source: String
   },
+  promiseList : [],
   name: 'home',
   data: () => ({
+    items: [
+        { title: '校园交流',tag:0},
+        { title: '失物招领',tag:1},
+        { title: '寻物启事',tag:2},
+        { title: '求人办事',tag:3 },
+      ],
+    tag_name:'校园交流',
     dialog: false,
+    send_dialog:false,
     post_items: [],
     REQUIRE: true,
     loading: false,
-    tips: '努力加载中...',
     cursor: 20,
     limit: 10,
     has_more: true,
+    post_tag: 0,
 
     rules: [
       value => value.length <= 5 || '图片限制5张',
     ],
-    rules_title: [v => !!v, v => (v && v.length <= 20 && v.length > 0) || '字数限制20字'],
-    rules_conetnt: [v => !!v, v => (v && v.length <= 200 && v.length > 0) || '字数限制200字'],
+    rules_title: [v => (v && v.length <= 20 && v.length >= 5) || '字数限制20字且不少于5字',v =>v.split(" ").join("").length === v.length || '不含空格'],
+    rules_conetnt: [v => !!v, v => (v && v.length <= 200 && v.length >= 5) || '字数限制200字且不少于5字'],
     valid: true,
     title: '',
     content: '',
@@ -222,16 +230,28 @@ export default {
     headerImage: {},
     picValue: {},
     filelist: [],
+    text: '请登陆后才能发布帖子',
+    snackbar: false,
+    timeout: 2000,
+    colorValue:'red lighten-2',
   }),
+  watch: {
+    send_dialog (val) {
+      if (!val) return
+
+      setTimeout(() => (this.send_dialog = false), 4000)
+    },
+  },
   created: function () {
     var _this = this
     //TODO fix sort 
+    _this.getUser()
     _this.$axios.get('/api/v1/post/get', {
       params: {
         cursor: 0,
         limit: 20,
         desc: 1,
-        tag: 0
+        tag: 1
       }
     }).then(function (res) {
       let errno = res.data.errno
@@ -244,9 +264,50 @@ export default {
       }
     })
   },
-
   methods: {
     // ...
+    set_avatar(value){
+      this.$store.commit('set_avatar',value)
+    },
+    set_current_id(value){
+      this.$store.commit('set_current_id',value)
+    },
+    set_auth_not_exist(){
+      let _this = this
+      _this.snackbar = true
+    },
+    getUser(){
+      let _this = this
+      this.$axios.get('/api/v1/user/get', { params: { user_id: 0 } }).then(function (res) {
+        let errno = res.data.errno
+          console.log(res.data.user_info)
+          _this.current_id = res.data.user_info.current_id
+          _this.set_avatar(res.data.user_info.avatar_url)
+          _this.set_current_id(res.data.user_info.user_id)
+       })  
+    },
+    async view_change(){
+      this.filelist = []
+      const files = document.getElementById('demo').files;
+      var promiseList=[]
+      for (let i = 0; i < files.length; i++) {
+        promiseList.push(new Promise((resolve, reject) => {
+          setTimeout(() => {
+            this.view(files[i])
+          }, Math.random() * 3000);
+        }));
+      }
+      Promise.all(promiseList).then((rspList) => {
+      });
+      
+    },
+    async view(file) {
+      if (typeof file === 'undefined') {
+        return
+      }
+      const res = await compressAccurately(file, 200)
+      await this.filelist.push(res)
+    },
     scroll(post_item) {
       let isLoading = false
       let _this = this
@@ -260,7 +321,7 @@ export default {
               cursor: _this.cursor,
               limit: _this.limit,
               desc: 1,
-              tag: 0,
+              tag:1
             }
           }).then(response => {
             _this.cursor = _this.cursor + _this.limit
@@ -293,7 +354,7 @@ export default {
           cursor: 0,
           limit: 20,
           desc: 1,
-          tag: 0,
+          tag: 1
         }
       }).then(function (res) {
         let errno = res.data.errno
@@ -308,173 +369,63 @@ export default {
         // console.log(_this.post_items)
       })
     },
+    setTag(index){
+      let _this = this
+      console.log(_this.items[index])
+      _this.post_tag = _this.items[index].tag
+      _this.tag_name = _this.items[index].title
+    }
+    ,
     postInfo() {
+      let formData = new FormData()
+      var pList = [];
       let _this = this
       _this.dialog = false
-      _this.formData = new FormData()
-      // let files = document.querySelector('input[type=file]').files
-      // console.log(files)
-      // await _this.changeimg(files)
-      // console.log(_this.filelist)
-      for (let i = 0; i < _this.filelist; i++) {
-        console.log(_this.filelist[i])
-        _this.formData.append("images", filelist[i])
-      }
-      _this.formData.append('title', _this.title)
-      _this.formData.append('content', _this.content)
-      console.log('formData', _this.formData.getAll)
-      _this.$axios({
+      console.log(_this.filelist)
+      _this.send_dialog = true
+      setTimeout(function (){
+        for (let i = 0; i < _this.filelist.length; i++) {
+            formData.append("images", _this.filelist[i])
+        }
+      },"2900");
+      
+      formData.append('title', _this.title)
+      formData.append('content', _this.content)
+      formData.append('tag', _this.post_tag)
+      console.log('formData', formData.getAll)
+      setTimeout(function (){
+        _this.$axios({
         url: '/api/v1/post/add',
         method: 'post',
         headers: {
           'Content-Type': 'multipart/form-data'
         },
-        data: _this.formData
-      }).then((response) => {
-        _this.InitData()
+        data: formData
+      }).then(function (res){
+        let errmsg = res.data.errmsg
+        let errno = res.data.errno
+        if (errno === 0){
+          _this.InitData() 
+        }else if(errno === 5004){
+        }
+        _this.$refs.form.reset()
+        _this.$refs.form.resetValidation()
+        _this.valid = false
       })
+      },"3000");
     },
-    async changeimg(files) {
-      var _this = this
-      console.log(files)
-      for (let i = 0; i < files.length; i++) {
-        console.log(files[i])
-        await _this.uploadSectionFile(files[0]);
+    pre_send(){
+      let _this = this
+      if (_this.$store.state.current_id === 0){
+        this.set_auth_not_exist()
+      }else{
+        _this.dialog = !_this.dialog
       }
     },
-    compress(img, Orientation) {
-      let canvas = document.createElement("canvas");
-      let ctx = canvas.getContext('2d');
-      //瓦片canvas
-      let tCanvas = document.createElement("canvas");
-      let tctx = tCanvas.getContext("2d");
-      let initSize = img.src.length;
-      let width = img.width;
-      let height = img.height;
-      //如果图片大于四百万像素，计算压缩比并将大小压至400万以下
-      let ratio;
-      if ((ratio = width * height / 4000000) > 1) {
-        console.log("大于400万像素")
-        ratio = Math.sqrt(ratio);
-        width /= ratio;
-        height /= ratio;
-      } else {
-        ratio = 1;
-      }
-      canvas.width = width;
-      canvas.height = height;
-      // 		铺底色
-      ctx.fillStyle = "#fff";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      //如果图片像素大于100万则使用瓦片绘制
-      let count;
-      if ((count = width * height / 1000000) > 1) {
-        console.log("超过100W像素");
-        count = ~~(Math.sqrt(count) + 1); //计算要分成多少块瓦片
-        //            计算每块瓦片的宽和高
-        let nw = ~~(width / count);
-        let nh = ~~(height / count);
-        tCanvas.width = nw;
-        tCanvas.height = nh;
-        for (let i = 0; i < count; i++) {
-          for (let j = 0; j < count; j++) {
-            tctx.drawImage(img, i * nw * ratio, j * nh * ratio, nw * ratio, nh * ratio, 0, 0, nw, nh);
-            ctx.drawImage(tCanvas, i * nw, j * nh, nw, nh);
-          }
-        }
-      } else {
-        ctx.drawImage(img, 0, 0, width, height);
-      }
-      //修复ios上传图片的时候 被旋转的问题
-      if (Orientation != "" && Orientation != 1) {
-        switch (Orientation) {
-          case 6://需要顺时针（向左）90度旋转
-            this.rotateImg(img, 'left', canvas);
-            break;
-          case 8://需要逆时针（向右）90度旋转
-            this.rotateImg(img, 'right', canvas);
-            break;
-          case 3://需要180度旋转
-            this.rotateImg(img, 'right', canvas);//转两次
-            this.rotateImg(img, 'right', canvas);
-            break;
-        }
-      }
-      //进行最小压缩
-      let ndata = canvas.toDataURL('image/jpeg', 0.1);
-
-      console.log('压缩前：' + initSize);
-      console.log('压缩后：' + ndata.length);
-      console.log("ndata:" + ndata)
-
-      console.log('压缩率：' + ~~(100 * (initSize - ndata.length) / initSize) + "%");
-      tCanvas.width = tCanvas.height = canvas.width = canvas.height = 0;
-
-      console.log(ndata)
-      return ndata;
-    },
-    async uploadSectionFile(f) { //	附件上传
-      let self = this;
-      let Orientation;
-      let ndata;
-
-      if (f.size <= 1 * 1024 * 1024) {
-        //判断图片是否大于1M,是就直接上传
-        ndata = f;
-        self.postImg(ndata);
-      } else {
-        //反之压缩图片
-        let reader = new FileReader();
-        // 将图片2将转成 base64 格式
-        console.log('-----------------f', f)
-        reader.readAsDataURL(f);
-        console.log(reader)
-        // 读取成功后的回调
-        let result = this.result;
-        let img = new Image();
-        img.src = result;
-        let data = await self.compress(img, Orientation);
-        self.headerImage = data;
-        ndata = await self.compress(img, Orientation);
-
-        //BASE64转图片
-        var arr = await ndata.split(','), mime = await arr[0].match(/:(.*?);/)[1],
-          bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-        console.log("arr-----------", arr)
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-        }
-        ndata = new File([u8arr], f.name, { type: mime })
-        console.log("ndata----------------", ndata)
-
-        await self.postImg(ndata);
-      }
-    },
-    postImg(ndata) {
-      var _this = this
-      console.log(ndata)
-      _this.filelist.push(ndata)
-    },
-    upfile(event) {
-      var files = event.target.files
-      for (let i; i < files.length; i++) {
-        var file = event.target.files[i]
-        var name = event.target.files[i].name;
-        lrz(file).then(rst => { //压缩图片
-          file = rst.file;
-          let file = new window.File([file], name, {
-            type: file.type
-          }) //把blob转化成file
-          this.filelist.push(file)
-        });
-        console.log(this.filelist)
-      }
-    },
+  },
     mounted() {
       this.scroll(this.post_items)
     },
-    // 压缩图片
-  }
 }
 </script>
 <style>

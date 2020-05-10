@@ -4,11 +4,25 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-04-05 00:37:35
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-05 23:38:50
+ * @LastEditTime: 2020-05-10 14:58:33
  -->
 <template>
   <v-app id="Post">
-
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="timeout"
+      :color="colorValue"
+      :label="colorValue"
+      :value="colorValue"
+    >
+      {{ text }}
+      <v-btn
+        text
+        @click="snackbar = false"
+      >
+        我知道了
+      </v-btn>
+    </v-snackbar>
     <v-row>
       <v-col
         cols="12"
@@ -63,7 +77,7 @@
             <v-btn
             text
             color="primary"
-            @click="commentAdm()"
+            @click="postEdit()"
             v-show="can_edit"
             
           >
@@ -142,29 +156,95 @@
           >
           回复楼主
         </v-btn>
+       
         <span style="font-size: 14px; padding: 10px">添加一条新回复</span><span>@{{comment_title}}</span>
-          <v-textarea
-            solo
-            clearable
-            counter
-            name="input-7-4"
-            label=""
-            width="750px"
-            v-model="comment_content"
-          >
-          
-          </v-textarea>
+          <v-form v-model="valid" ref="form">
+            <v-textarea
+              solo
+              clearable
+              counter
+              name="input-7-4"
+              label=""
+              width="750px"
+              v-model="comment_content"
+              :rules="rules_comment"
+              
+            >
+            
+            </v-textarea>
+          </v-form>
           <v-btn
             text
             color="primary"
-            @click="commentSent()"
+            :disabled="!valid"
+            @click="pre_comment()"
           >
           回复
           </v-btn>
          </v-card>
-       
         </v-col>
     </v-row>
+    <v-dialog
+      v-model="dialog"
+      width="800px"
+    >
+      <v-form v-model="valid" ref="form">
+        <v-card>
+          <v-card-title>
+            编辑帖子
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-container>
+            <v-row class="mx-2">
+              <v-col
+                cols="12"
+                style="padding:0px"
+              >
+                <v-text-field
+                  v-model="edit_title"
+                  clearable
+                  clear-icon="cancel"
+                  :rules="rules_title"
+                  counter="20"
+                  outlined=""
+                  label="一句话描述你遇到的问题或想分享的主题"
+                ></v-text-field>
+              </v-col>
+              <v-col
+                cols="12"
+                style="padding:0px"
+              >
+                <v-textarea
+                  v-model="edit_content"
+                  :rules="rules_conetnt"
+                  clearable
+                  clear-icon="cancel"
+                  solo=""
+                  label="输入描述,越详细越好"
+                  height="350px"
+                ></v-textarea>
+              </v-col>
+            </v-row>
+          </v-container>
+          <v-card-actions>
+
+            <v-spacer />
+            <v-btn
+              text
+              color="
+                primary"
+              @click="dialog = false"
+            >取消</v-btn>
+            <v-btn
+              text
+              color="primary"
+              @click="postUpdate()"
+              :disabled="!valid"
+            >编辑</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -174,6 +254,10 @@ export default {
     source: String
   },
   data: () => ({
+    snackbar: false,
+    text: '请登陆后才能发表评论',
+    timeout: 2000,
+    colorValue:'red lighten-2',
     dialog: false,
     post_items: [],
     REQUIRE: true,
@@ -194,8 +278,12 @@ export default {
     comment_title:"",
     can_delete:false,
     can_edit:false,
-    
-    
+    valid: true,
+    edit_title:"",
+    edit_content:"",
+    rules_title: [v => (v && v.length <= 20 && v.length >= 5) || '字数限制20字且不少于5字',v =>(v && v.split(" ").join("").length === v.length) || '不含空格'],
+    rules_comment: [v => (v && v.length <= 50 && v.length >= 5) || '字数限制50字且不少于5字',v =>(v && v.split(" ").join("").length === v.length) || '不含空格'],
+    rules_conetnt: [v => !v, v => (v && v.length <= 200 && v.length >= 5) || '字数限制200字且不少于5字'],
 
   }),
 
@@ -203,7 +291,6 @@ export default {
     let _this = this
     
     _this.id = _this.$route.query.id
-    console.log("Post.vue id", _this.id)
     _this.$axios.get('/api/v1/post/item/get', {
       params: {
         post_id: _this.id,
@@ -225,7 +312,8 @@ export default {
       if (res.data.image_list !== null) {
         _this.image_show = true
       }
-
+      _this.edit_content = _this.post.content
+      _this.edit_title = _this.post.title
        _this.$axios.get('/api/v1/user/get', { params: { user_id: 0 } }).then(function (res) {
           let errno = res.data.errno
             console.log(_this.post.poster_id === res.data.user_info.user_id || res.data.user_info.manager_status === 1)
@@ -237,10 +325,35 @@ export default {
     })
   },
   methods: {
+    postEdit: function(){
+      let _this = this
+      _this.dialog = true
+    },
+    postUpdate: function(){
+      let _this = this
+       _this.$axios.post('/api/v1/post/update', {
+        'post_id': Number(_this.id),
+        'title': _this.edit_title,
+        'content': _this.edit_content
+      }).then(function (res) {
+        let errno = res.data.errno
+        if (errno === 0) {
+          _this.post.content = _this.edit_content
+          _this.post.title = _this.edit_title 
+          _this.dialog = false
+        }
+      
+      })
+    },
+    set_auth_not_exist: function(){
+      let _this = this
+      _this.snackbar = true
+    },
+    
     InitData(){
       let _this = this
-      _this.comment_title = ""
-      _this.comment_content = ""
+      // _this.comment_title = ""
+      // _this.comment_content = ""
       _this.id = _this.$route.query.id
       console.log("Post.vue id", _this.id)
       _this.$axios.get('/api/v1/post/item/get', {
@@ -248,14 +361,14 @@ export default {
           post_id: _this.id,
           cursor: 0,
           limit: 102410241024,
-          desc: 1,
+          desc: 0,
           tag: 0,
         }
     }).then(function (res) {
       let errno = res.data.errno
       if (errno !== 0) {
         console.log(errno)
-      }
+      } 
       console.log(res.data)
       // for (let i in res.data.post_list) {
       //   _this.post_items.push(res.data.post_list[i])
@@ -291,6 +404,15 @@ export default {
       _this.user_for = _this.post.poster_id
       window.scrollTo(0, 1024101241024)
     },
+    pre_comment(){
+      let _this = this
+      if (_this.$store.state.current_id === 0){
+        _this.set_auth_not_exist()
+      }else{
+        _this.commentSent()
+      }
+      
+    },
     commentSent(){
       let _this = this
       _this.user_for = _this.post.poster_id
@@ -301,11 +423,14 @@ export default {
         let errmsg = res.data.errmsg
         let errno = res.data.errno
         if (errno === 0){
-          window.scrollTo(0, 0)
-          _this.InitData()
-          
+          _this.InitData() 
+        }else if(errno === 5004){
+          _this.set_auth_not_exist()
         }
       })
+      _this.$refs.form.reset()
+      _this.$refs.form.resetValidation()
+      _this.valid = false
     },
     renderHome() {
       let _this = this

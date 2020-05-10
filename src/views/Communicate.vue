@@ -1,3 +1,11 @@
+<!--
+ * @Descripttion: 
+ * @version: 
+ * @Author: Zheng Gaoxiong
+ * @Date: 2020-05-10 17:10:00
+ * @LastEditors: Zheng Gaoxiong
+ * @LastEditTime: 2020-05-10 19:02:14
+ -->
 <template >
   <v-app id="inspire">
     <v-snackbar
@@ -251,12 +259,11 @@ export default {
         cursor: 0,
         limit: 20,
         desc: 1,
-        tag: 5
+        tag: 0
       }
     }).then(function (res) {
       let errno = res.data.errno
       if (errno !== 0) {
-        console.log(errno)
       }
 
       for (let i in res.data.post_list) {
@@ -280,7 +287,6 @@ export default {
       let _this = this
       this.$axios.get('/api/v1/user/get', { params: { user_id: 0 } }).then(function (res) {
         let errno = res.data.errno
-          console.log(res.data.user_info)
           _this.current_id = res.data.user_info.current_id
           _this.set_avatar(res.data.user_info.avatar_url)
           _this.set_current_id(res.data.user_info.user_id)
@@ -309,22 +315,19 @@ export default {
       await this.filelist.push(res)
     },
     scroll(post_item) {
-      console.log("sss")
       let isLoading = false
       let _this = this
       window.onscroll = () => {
         // 距离底部200px时加载一次
         let bottomOfWindow = document.documentElement.offsetHeight - document.documentElement.scrollTop - window.innerHeight <= 200
-        console.log("height",bottomOfWindow)
         if (bottomOfWindow && isLoading === false && _this.has_more === true) {
-          console.log("test")
           isLoading = true
           _this.$axios.get('/api/v1/post/get', {
             params: {
               cursor: _this.cursor,
               limit: _this.limit,
               desc: 1,
-              tag:5
+              tag:0
             }
           }).then(response => {
             _this.cursor = _this.cursor + _this.limit
@@ -357,12 +360,11 @@ export default {
           cursor: 0,
           limit: 20,
           desc: 1,
-          tag: 5
+          tag: 0
         }
       }).then(function (res) {
         let errno = res.data.errno
         if (errno !== 0) {
-          console.log(errno)
         }
         _this.has_more = res.data.has_more
         // console.log(res.data.post_list)
@@ -425,7 +427,6 @@ export default {
         _this.dialog = !_this.dialog
       }
     },
-    
   },
   mounted() {
       this.scroll(this.post_items)
