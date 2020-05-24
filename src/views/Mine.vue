@@ -4,7 +4,10 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-04-05 14:18:07
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-10 15:21:50
+ * @LastEditTime: 2020-05-23 13:32:33
+ -->
+ <!--
+ TODO flush error
  -->
 <template>
   <v-app id="Profile">
@@ -317,20 +320,20 @@ export default {
   created: function () {
     var _this = this
     _this.id = _this.$store.state.current_id
-    _this.$axios.get('/api/v1/user/get', { params: { user_id: _this.id } }).then(function (res) {
+    _this.$axios.get('/api/v1/user/get', { params: { user_id: _this.$store.state.current_id } }).then(function (res) {
       let errno = res.data.errno
       if (errno !== 0) {
-        // console.log(errno)
+        // //console.log(errno)
       }
       _this.user_info = res.data.user_info
-      console.log("user_id",_this.id )
-      console.log("current_id",_this.$store.state.current_id)
+      //console.log("user_id",_this.id )
+      //console.log("current_id",_this.$store.state.current_id)
       _this.can_edit = (_this.id  == _this.$store.state.current_id)
     })
     _this.$axios.get('/api/v1/user/profile/get', { params: { user_id: _this.id } }).then(function (res) {
       let errno = res.data.errno
       if (errno !== 0) {
-        // console.log(errno)
+        // //console.log(errno)
       }
       _this.profile_info = res.data.profile_info
     })
@@ -343,27 +346,27 @@ export default {
     InitData() {
       var _this = this
       _this.id = _this.$store.state.current_id
-      _this.$axios.get('/api/v1/user/get', { params: { user_id: _this.id } }).then(function (res) {
+      _this.$axios.get('/api/v1/user/get', { params: { user_id: _this.$store.state.current_id } }).then(function (res) {
         let errno = res.data.errno
         if (errno !== 0) {
-          // console.log(errno)
+          // //console.log(errno)
         }
         _this.user_info = res.data.user_info
       })
-      _this.$axios.get('/api/v1/user/profile/get', { params: { user_id: _this.id } }).then(function (res) {
+      _this.$axios.get('/api/v1/user/profile/get', { params: { user_id: _this.$store.state.current_id } }).then(function (res) {
         let errno = res.data.errno
         if (errno !== 0) {
-          // console.log(errno)
+          // //console.log(errno)
         }
         _this.profile_info = res.data.profile_info
       })
       if (_this.$store.state.current_id === _this.id){
-        _this.set_avatar(user_info.avatar_url)
+        // _this.set_avatar(_this.user_info.avatar_url)
       }
     },
     setTag(index){
       let _this = this
-      console.log(_this.sex_items[index])
+      //console.log(_this.sex_items[index])
       _this.post_tag = _this.sex_items[index].tag
       _this.sex_tag = _this.sex_items[index].title
     },
@@ -394,7 +397,7 @@ export default {
       var pList = [];
       let _this = this
       _this.dialog = false
-      console.log(_this.filelist)
+      //console.log(_this.filelist)
       _this.send_dialog = true
       setTimeout(function (){
         formData.append("avatar", _this.filelist[0])
@@ -407,7 +410,7 @@ export default {
       formData.append('sex', _this.post_tag)
       formData.append('qq_number', _this.qq_number)
       formData.append('telnumber', _this.tel_number)      
-      console.log('formData', formData.getAll)
+      //console.log('formData', formData.getAll)
       setTimeout(function (){
         _this.$axios({
         url: '/api/v1/user/update',

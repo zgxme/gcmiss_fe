@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2019-12-16 23:20:22
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-10 17:22:11
+ * @LastEditTime: 2020-05-23 16:27:28
  */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
@@ -20,6 +20,8 @@ import Lose from '../views/Lose.vue'
 import Find from '../views/Find.vue'
 import Help from '../views/Help.vue'
 import Active from '../views/Active.vue'
+import Transaction from "../views/Transaction.vue"
+import Artical from "../views/Artical.vue"
 import Router from 'vue-router'
 
 Vue.use(VueRouter)
@@ -34,6 +36,8 @@ const routes = [
   { path: '/communicate', name:'communicate', component:Communicate},
   { path: '/help', name:'help', component:Help},
   { path: '/lose', name: 'lose', component: Lose},
+  { path: '/transaction', name: 'transaction', component: Transaction},
+  { path: '/artical', name: 'artical', component: Artical},
   { path: '/active', name: 'active', component: Active},
   { path: '/mine', name: 'mine', component: Mine},
   { path: '/404', component: NoFound },

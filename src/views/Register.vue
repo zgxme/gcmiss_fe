@@ -133,7 +133,7 @@
                 <v-btn
                   color="primary"
                   @click="login"
-                >登陆账号</v-btn>
+                >登录账号</v-btn>
               </v-card-actions>
             </v-card>
           </v-col>
@@ -211,14 +211,13 @@ export default {
       _this.$router.push('/login')
     },
     regiser: function () {
-      // console.log(this.nickname, this.email)
+      // //console.log(this.nickname, this.email)
       var _this = this
       _this.$axios.post('/api/v1/user/register',
         { 'nickname': this.nickname, 'password': this.password, 'email':this.email}
       ).then(function (res) {
         let errmsg = res.data.errmsg
         let errno = res.data.errno
-        console.log(res.data)
         if (errno === 4003){
           _this.set_login_name_exist()
           
@@ -228,7 +227,7 @@ export default {
         else if(errno === 0){
           _this.send_dialog = true
           setTimeout(function (){
-          _this.$router.push({ path: '/about' })
+          _this.$router.push({ path: '/' })
           },"2000");
         }
       })

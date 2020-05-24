@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-04-05 14:18:07
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-10 16:10:32
+ * @LastEditTime: 2020-05-24 11:51:52
  -->
 <template>
   <v-app id="Profile">
@@ -78,6 +78,30 @@
           max-width="750px"
           tile
         >
+        <v-btn
+            text
+            color="primary"
+            @click="deleteUser()"
+            v-show="can_delete_user"
+          >
+            删除用户
+          </v-btn>
+          <v-btn
+            text
+            color="primary"
+            @click="deleteManager()"
+            v-show="can_delete_manager"
+          >
+            删除管理员
+          </v-btn>
+          <v-btn
+            text
+            color="primary"
+            @click="registerManager()"
+            v-show="can_register_manager"
+          >
+            注册为管理员
+          </v-btn>
         <v-form v-model="valid" ref="form" v-show="can_edit">
         <v-card>
           <v-card-title>
@@ -325,6 +349,10 @@ export default {
     dialog: false,
     send_dialog:false,
     can_edit:false,
+    can_delete_user:false,
+    can_delete_manager:false,
+    can_register_manager: false,
+    now_user:'',
     rules_qq:[v => ((v && v.length <= 15)||(!v)) || '字符限制不超过15位',v =>((v && v.split(" ").join("").length === v.length) ||(!v)) || '不含空格', v=> ((v && /^[0-9]*$/.test(v) || (!v)) || '仅包含数字')],
     rules_tel_num:[v => ((v && v.length == 11)||(!v)) || '字符限制11位',v =>((v && v.split(" ").join("").length === v.length) ||(!v)) || '不含空格', v=> ((v && /^[0-9]*$/.test(v) ||(!v)) ||  '仅包含数字')],
     rules_name:[v => ((v && v.length <= 10)||(!v)) || '字符限制不超过10位',v =>((v && v.split(" ").join("").length === v.length) ||(!v)) || '不含空格'],
@@ -340,17 +368,31 @@ export default {
     _this.$axios.get('/api/v1/user/get', { params: { user_id: _this.id } }).then(function (res) {
       let errno = res.data.errno
       if (errno !== 0) {
-        // console.log(errno)
+        // //console.log(errno)
       }
       _this.user_info = res.data.user_info
-      console.log("user_id",_this.id )
-      console.log("current_id",_this.$store.state.current_id)
+      //console.log("user_id",_this.id )
+      //console.log("current_id",_this.$store.state.current_id)
+      _this.$axios.get('/api/v1/user/get', { params: { user_id:_this.$store.state.current_id } }).then(function (res) {
+        let errno = res.data.errno
+        if (errno !== 0){
+          
+        }
+        _this.now_user = res.data.user_info
+        // console.log(_this.user_info)
+        // console.log(_this.now_user)
+        _this.can_delete_user = (_this.user_info.manager_status === 0 && _this.now_user.manager_status !== 0 && _this.user_info.user_id !== 0)
+        _this.can_register_manager = (_this.user_info.manager_status === 0 && _this.now_user.manager_status === 2 && _this.user_info.user_id !== 0)
+        // console.log(_this.can_delete_user)
+        _this.can_delete_manager = (_this.user_info.manager_status === 1 && _this.now_user.manager_status === 2 && _this.user_info.user_id !== 0)
+      })
       _this.can_edit = (_this.id  == _this.$store.state.current_id)
+      
     })
     _this.$axios.get('/api/v1/user/profile/get', { params: { user_id: _this.id } }).then(function (res) {
       let errno = res.data.errno
       if (errno !== 0) {
-        // console.log(errno)
+        // //console.log(errno)
       }
       _this.profile_info = res.data.profile_info
     })
@@ -374,14 +416,14 @@ export default {
       _this.$axios.get('/api/v1/user/get', { params: { user_id: _this.id } }).then(function (res) {
         let errno = res.data.errno
         if (errno !== 0) {
-          // console.log(errno)
+          // //console.log(errno)
         }
         _this.user_info = res.data.user_info
       })
       _this.$axios.get('/api/v1/user/profile/get', { params: { user_id: _this.id } }).then(function (res) {
         let errno = res.data.errno
         if (errno !== 0) {
-          // console.log(errno)
+          // //console.log(errno)
         }
         _this.profile_info = res.data.profile_info
       })
@@ -391,7 +433,7 @@ export default {
     },
     setTag(index){
       let _this = this
-      console.log(_this.sex_items[index])
+      //console.log(_this.sex_items[index])
       _this.post_tag = _this.sex_items[index].tag
       _this.sex_tag = _this.sex_items[index].title
     },
@@ -422,7 +464,7 @@ export default {
       var pList = [];
       let _this = this
       _this.dialog = false
-      console.log(_this.filelist)
+      //console.log(_this.filelist)
       _this.send_dialog = true
       setTimeout(function (){
         formData.append("avatar", _this.filelist[0])
@@ -435,7 +477,7 @@ export default {
       formData.append('sex', _this.post_tag)
       formData.append('qq_number', _this.qq_number)
       formData.append('telnumber', _this.tel_number)      
-      console.log('formData', formData.getAll)
+      //console.log('formData', formData.getAll)
       setTimeout(function (){
         _this.$axios({
         url: '/api/v1/user/update',
@@ -457,7 +499,51 @@ export default {
       _this.$refs.form.reset()
       _this.$refs.form.resetValidation()
       _this.valid = true
-    }
+    },
+    deleteUser(){
+      let _this = this      
+      _this.$axios.post('/api/v1/manager/delete',
+        { 'nickname': _this.user_info.nickname}
+      ).then(function (res) {
+        let errmsg = res.data.errmsg
+        let errno = res.data.errno
+        if (errno === 0){
+          _this.renderHome()
+        }
+      })
+    },
+    registerManager(){
+      let _this = this      
+      _this.$axios.post('/api/v1/manager/register',
+        { 'nickname': _this.user_info.nickname}
+      ).then(function (res) {
+        let errmsg = res.data.errmsg
+        let errno = res.data.errno
+        if (errno === 0){
+          _this.renderHome()
+        }
+      })
+      
+    },
+    deleteManager(){
+      let _this = this      
+      _this.$axios.post('/api/v1/manager/deleteManager',
+        { 'nickname': _this.user_info.nickname}
+      ).then(function (res) {
+        let errmsg = res.data.errmsg
+        let errno = res.data.errno
+        if (errno === 0){
+          _this.renderHome()
+        }
+      })
+      
+    },
+    renderHome() {
+      let _this = this
+      if (_this.$router.currentRoute.path !== '/') {
+        _this.$router.push({ path: '/', query: {} })
+      }
+    },
     
   }
 

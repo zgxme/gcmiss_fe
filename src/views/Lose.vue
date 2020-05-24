@@ -220,7 +220,7 @@ export default {
     rules: [
       value => value.length <= 5 || '图片限制5张',
     ],
-    rules_title: [v => (v && v.length <= 20 && v.length >= 5) || '字数限制20字且不少于5字',v =>v.split(" ").join("").length === v.length || '不含空格'],
+    rules_title: [v => (v && v.length <= 20 && v.length >= 5) || '字数限制20字且不少于5字',v =>((v && v.split(" ").join("").length === v.length))|| '不含空格'],
     rules_conetnt: [v => !!v, v => (v && v.length <= 200 && v.length >= 5) || '字数限制200字且不少于5字'],
     valid: true,
     title: '',
@@ -230,7 +230,7 @@ export default {
     headerImage: {},
     picValue: {},
     filelist: [],
-    text: '请登陆后才能发布帖子',
+    text: '请登录后才能发布帖子',
     snackbar: false,
     timeout: 2000,
     colorValue:'red lighten-2',
@@ -256,7 +256,7 @@ export default {
     }).then(function (res) {
       let errno = res.data.errno
       if (errno !== 0) {
-        console.log(errno)
+        //console.log(errno)
       }
 
       for (let i in res.data.post_list) {
@@ -280,7 +280,7 @@ export default {
       let _this = this
       this.$axios.get('/api/v1/user/get', { params: { user_id: 0 } }).then(function (res) {
         let errno = res.data.errno
-          console.log(res.data.user_info)
+          //console.log(res.data.user_info)
           _this.current_id = res.data.user_info.current_id
           _this.set_avatar(res.data.user_info.avatar_url)
           _this.set_current_id(res.data.user_info.user_id)
@@ -325,7 +325,7 @@ export default {
             }
           }).then(response => {
             _this.cursor = _this.cursor + _this.limit
-            // console.log(response.data.post_list)
+            // //console.log(response.data.post_list)
             // _this.post_items.push(response.data.post_list)
             for (let i in response.data.post_list) {
               if (response.data.post_list[i].post_id !== null) {
@@ -359,19 +359,19 @@ export default {
       }).then(function (res) {
         let errno = res.data.errno
         if (errno !== 0) {
-          console.log(errno)
+          //console.log(errno)
         }
         _this.has_more = res.data.has_more
-        // console.log(res.data.post_list)
+        // //console.log(res.data.post_list)
         for (let i in res.data.post_list) {
           _this.post_items.push(res.data.post_list[i])
         }
-        // console.log(_this.post_items)
+        // //console.log(_this.post_items)
       })
     },
     setTag(index){
       let _this = this
-      console.log(_this.items[index])
+      //console.log(_this.items[index])
       _this.post_tag = _this.items[index].tag
       _this.tag_name = _this.items[index].title
     }
@@ -381,7 +381,7 @@ export default {
       var pList = [];
       let _this = this
       _this.dialog = false
-      console.log(_this.filelist)
+      //console.log(_this.filelist)
       _this.send_dialog = true
       setTimeout(function (){
         for (let i = 0; i < _this.filelist.length; i++) {
@@ -392,7 +392,7 @@ export default {
       formData.append('title', _this.title)
       formData.append('content', _this.content)
       formData.append('tag', _this.post_tag)
-      console.log('formData', formData.getAll)
+      //console.log('formData', formData.getAll)
       setTimeout(function (){
         _this.$axios({
         url: '/api/v1/post/add',

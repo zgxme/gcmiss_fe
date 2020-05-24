@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2019-12-16 23:20:22
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-10 19:01:49
+ * @LastEditTime: 2020-05-23 16:34:42
  -->
 <template>
   <v-app id="inspire">
@@ -15,7 +15,7 @@
       :label="colorValue"
       :value="colorValue"
     >
-      {{ text }}
+      {{ text_admin }}
       <v-btn
         text
         @click="snackbar = false"
@@ -121,7 +121,7 @@
         solo-inverted
         hide-details
         prepend-inner-icon="mdi-magnify"
-        label="Search"
+        label="搜索"
         class="hidden-sm-and-down"
       />
       <v-spacer />
@@ -181,7 +181,7 @@ export default {
     dialog: false,
     drawer: false,
     snackbar: false,
-    text: '请登陆后才能查看个人主页',
+    text_admin: '请登录后才能查看个人主页',
     timeout: 2000,
     colorValue:'red lighten-2',
     items: [
@@ -193,7 +193,7 @@ export default {
       { icon: '', text: '二手市场', href:'', method: 'transaction'},
       { icon: '', text: '设置', href:'', method:'setting'},
       { icon: '', text: '注册', href:'/api/v1/user/logout',method:'register'} ,
-      { icon: '', text: '登陆', href:'/api/v1/user/logout',method:'login'} ,
+      { icon: '', text: '登录', href:'/api/v1/user/logout',method:'login'} ,
       { icon: '', text: '登出', href:'/api/v1/user/logout',method:'logout'} ,
     ],
     avatar_url: '',
@@ -265,25 +265,19 @@ export default {
     },
     renderComm(){
       let _this = this
-       if (_this.$store.state.current_id === 0){
-        _this.set_auth_not_exist()
-      }else if (_this.$router.currentRoute.path !== 'communicate'){
+      if (_this.$router.currentRoute.path !== 'communicate'){
         _this.$router.push({ path:'/communicate'})
       }
     },
     renderFind(){
-       let _this = this
-       if (_this.$store.state.current_id === 0){
-        _this.set_auth_not_exist()
-      }else if (_this.$router.currentRoute.path !== 'find'){
+      let _this = this
+      if (_this.$router.currentRoute.path !== 'find'){
         _this.$router.push({ path:'/find'})
       }
     },
     renderHelp(){
       let _this = this
-       if (_this.$store.state.current_id === 0){
-        _this.set_auth_not_exist()
-      }else if (_this.$router.currentRoute.path !== 'help'){
+      if (_this.$router.currentRoute.path !== 'help'){
         _this.$router.push({ path:'/help'})
       }
     },

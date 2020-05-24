@@ -48,7 +48,7 @@
                 dark
                 flat
               >
-                <v-toolbar-title>登陆</v-toolbar-title>
+                <v-toolbar-title>登录</v-toolbar-title>
                 <v-spacer />
 
               </v-toolbar>
@@ -88,7 +88,7 @@
                   :disabled="!valid"
                   color="primary"
                   @click="login"
-                >立即登陆</v-btn>
+                >立即登录</v-btn>
                 <v-btn
                   color="primary"
                   @click="register"
@@ -151,7 +151,7 @@ export default {
       _this.snackbar_err = true
     },
     login: function () {
-      // console.log(this.nickname, this.email)
+      // //console.log(this.nickname, this.email)
       let _this = this
       _this.$axios.post('/api/v1/user/login',
         { 'nickname': this.nickname, 'password': this.password }

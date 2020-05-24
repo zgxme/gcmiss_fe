@@ -2,9 +2,9 @@
  * @Descripttion: 
  * @version: 
  * @Author: Zheng Gaoxiong
- * @Date: 2020-05-10 17:09:22
+ * @Date: 2020-05-10 17:10:00
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-10 21:47:06
+ * @LastEditTime: 2020-05-23 16:33:02
  -->
 <template >
   <v-app id="inspire">
@@ -84,7 +84,7 @@
           dark
         >
           <v-card-text>
-            正在发表中,请稍等
+            正在发布中,请稍等
             <v-progress-linear
               indeterminate
               color="white"
@@ -100,7 +100,7 @@
       <v-form v-model="valid" ref="form">
         <v-card>
           <v-card-title>
-            发布帖子
+            发布/寻求闲置物品
           </v-card-title>
           <v-divider></v-divider>
           <v-container>
@@ -116,7 +116,7 @@
                   :rules="rules_title"
                   counter="20"
                   outlined=""
-                  label="一句话描述你遇到的问题或想分享的主题"
+                  label="一句话描述你要出手/想要的闲置物品"
                 ></v-text-field>
               </v-col>
               <v-col
@@ -133,7 +133,21 @@
                   height="350px"
                 ></v-textarea>
               </v-col>
-              <div class="text-center">
+              <v-col
+                cols=4
+                style="padding:0px"
+              >
+                <v-text-field
+                  v-model="price"
+                  clearable
+                  :rules="rules_price"
+                  clear-icon="cancel"
+                  counter="8"
+                  outlined=""
+                  label="出手/可接受价格(元)"
+                ></v-text-field>
+              </v-col>
+              <!-- <div class="text-center">
                 <v-menu offset-y>
                   <template v-slot:activator="{ on }">
                     <span style="font-size: 14px; color: rgba(0, 0, 0, 0.6);">
@@ -159,7 +173,7 @@
                     </v-list-item>
                   </v-list>
                 </v-menu>
-              </div>
+              </div> -->
             </v-row>
           </v-container>
           <v-card-actions>
@@ -230,15 +244,17 @@ export default {
     ],
     rules_title: [v => (v && v.length <= 20 && v.length >= 5) || '字数限制20字且不少于5字',v =>((v && v.split(" ").join("").length === v.length)) || '不含空格'],
     rules_conetnt: [v => !!v, v => (v && v.length <= 200 && v.length >= 5) || '字数限制200字且不少于5字'],
+    rules_price:[v => (!(v[0] === '0' && v.length >= 2)||(!v)) || '不符合金钱格式',v => ((v && v.length <= 8)||(!v)) || '字符限制不超过8位',v =>((v && v.split(" ").join("").length === v.length) ||(!v)) || '不含空格', v=> ((v && /^[0-9]*$/.test(v) || (!v)) || '仅包含数字')],
     valid: true,
     title: '',
     content: '',
+    price: 0,
     files_num: 0,
     formData: {},
     headerImage: {},
     picValue: {},
     filelist: [],
-    text: '请登录后才能发布帖子',
+    text: '请登录后才能发布闲置物品',
     snackbar: false,
     timeout: 2000,
     colorValue:'red lighten-2',
@@ -254,17 +270,16 @@ export default {
     var _this = this
     //TODO fix sort 
     _this.getUser()
-    _this.$axios.get('/api/v1/post/get', {
+    _this.$axios.get('/api/v1/artical/get', {
       params: {
         cursor: 0,
         limit: 20,
         desc: 1,
-        tag: 2
+        tag: 0
       }
     }).then(function (res) {
       let errno = res.data.errno
       if (errno !== 0) {
-        //console.log(errno)
       }
 
       for (let i in res.data.post_list) {
@@ -288,7 +303,6 @@ export default {
       let _this = this
       this.$axios.get('/api/v1/user/get', { params: { user_id: 0 } }).then(function (res) {
         let errno = res.data.errno
-          //console.log(res.data.user_info)
           _this.current_id = res.data.user_info.current_id
           _this.set_avatar(res.data.user_info.avatar_url)
           _this.set_current_id(res.data.user_info.user_id)
@@ -324,12 +338,12 @@ export default {
         let bottomOfWindow = document.documentElement.offsetHeight - document.documentElement.scrollTop - window.innerHeight <= 200
         if (bottomOfWindow && isLoading === false && _this.has_more === true) {
           isLoading = true
-          _this.$axios.get('/api/v1/post/get', {
+          _this.$axios.get('/api/v1/artical/get', {
             params: {
               cursor: _this.cursor,
               limit: _this.limit,
               desc: 1,
-              tag:2
+              tag:0
             }
           }).then(response => {
             _this.cursor = _this.cursor + _this.limit
@@ -350,24 +364,23 @@ export default {
     },
     renderPost(post_id) {
       let _this = this
-      _this.$router.push({ path: '/post', query: { id: post_id } })
+      _this.$router.push({ path: '/artical', query: { id: post_id } })
     },
     InitData() {
       var _this = this
       _this.post_items = []
       _this.cursor = 20
       _this.limit = 10
-      _this.$axios.get('/api/v1/post/get', {
+      _this.$axios.get('/api/v1/artical/get', {
         params: {
           cursor: 0,
           limit: 20,
           desc: 1,
-          tag: 2
+          tag: 0
         }
       }).then(function (res) {
         let errno = res.data.errno
         if (errno !== 0) {
-          //console.log(errno)
         }
         _this.has_more = res.data.has_more
         // //console.log(res.data.post_list)
@@ -397,13 +410,16 @@ export default {
         }
       },"2900");
       
-      formData.append('title', _this.title)
-      formData.append('content', _this.content)
-      formData.append('tag', _this.post_tag)
+      formData.append('artical_name', _this.title)
+      formData.append('artical_desc', _this.content)
+      if (typeof _this.price === 'undefined') {
+         _this.price = 0
+      }
+      formData.append('artical_price', _this.price)
       //console.log('formData', formData.getAll)
       setTimeout(function (){
         _this.$axios({
-        url: '/api/v1/post/add',
+        url: '/api/v1/artical/add',
         method: 'post',
         headers: {
           'Content-Type': 'multipart/form-data'

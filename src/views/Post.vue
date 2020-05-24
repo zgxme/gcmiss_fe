@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-04-05 00:37:35
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-10 14:58:33
+ * @LastEditTime: 2020-05-24 11:45:10
  -->
 <template>
   <v-app id="Post">
@@ -255,7 +255,7 @@ export default {
   },
   data: () => ({
     snackbar: false,
-    text: '请登陆后才能发表评论',
+    text: '请登录后才能发表评论',
     timeout: 2000,
     colorValue:'red lighten-2',
     dialog: false,
@@ -281,8 +281,8 @@ export default {
     valid: true,
     edit_title:"",
     edit_content:"",
-    rules_title: [v => (v && v.length <= 20 && v.length >= 5) || '字数限制20字且不少于5字',v =>(v && v.split(" ").join("").length === v.length) || '不含空格'],
-    rules_comment: [v => (v && v.length <= 50 && v.length >= 5) || '字数限制50字且不少于5字',v =>(v && v.split(" ").join("").length === v.length) || '不含空格'],
+    rules_title: [v => (v && v.length <= 20 && v.length >= 5) || '字数限制20字且不少于5字',v =>((v && v.split(" ").join("").length === v.length)) || '不含空格'],
+    rules_comment: [v => (v && v.length <= 50 && v.length >= 5) || '字数限制50字且不少于5字',v =>((v && v.split(" ").join("").length === v.length)) || '不含空格'],
     rules_conetnt: [v => !v, v => (v && v.length <= 200 && v.length >= 5) || '字数限制200字且不少于5字'],
 
   }),
@@ -302,10 +302,8 @@ export default {
     }).then(function (res) {
       let errno = res.data.errno
       if (errno !== 0) {
-        console.log(errno)
-        _this.canDelete()
+        // _this.canDelete()
       }
-      console.log(res.data)
       _this.post = res.data.post
       _this.comment_list = res.data.comment_list
       _this.post_images = res.data.image_list
@@ -316,10 +314,10 @@ export default {
       _this.edit_title = _this.post.title
        _this.$axios.get('/api/v1/user/get', { params: { user_id: 0 } }).then(function (res) {
           let errno = res.data.errno
-            console.log(_this.post.poster_id === res.data.user_info.user_id || res.data.user_info.manager_status === 1)
-            console.log(_this.post)
-            console.log(res.data.user_info)
-            _this.can_delete = ( res.data.user_info.manager_status === true || _this.post.poster_id === res.data.user_info.user_id)
+            //console.log(_this.post.poster_id === res.data.user_info.user_id || res.data.user_info.manager_status === 1)
+            //console.log(_this.post)
+            //console.log(res.data.user_info)
+            _this.can_delete = (( res.data.user_info.manager_status !== 0 || _this.post.poster_id === res.data.user_info.user_id) &&  _this.post.poster_id !== 0)
             _this.can_edit = (_this.post.poster_id === res.data.user_info.user_id)
         })
     })
@@ -355,7 +353,7 @@ export default {
       // _this.comment_title = ""
       // _this.comment_content = ""
       _this.id = _this.$route.query.id
-      console.log("Post.vue id", _this.id)
+      //console.log("Post.vue id", _this.id)
       _this.$axios.get('/api/v1/post/item/get', {
         params: {
           post_id: _this.id,
@@ -367,13 +365,13 @@ export default {
     }).then(function (res) {
       let errno = res.data.errno
       if (errno !== 0) {
-        console.log(errno)
+        //console.log(errno)
       } 
-      console.log(res.data)
+      //console.log(res.data)
       // for (let i in res.data.post_list) {
       //   _this.post_items.push(res.data.post_list[i])
       // }
-      // console.log(_this.post_items)
+      // //console.log(_this.post_items)
       _this.post = res.data.post
       _this.comment_list = res.data.comment_list
       _this.post_images = res.data.image_list
@@ -414,9 +412,10 @@ export default {
       
     },
     commentSent(){
-      let _this = this
-      _this.user_for = _this.post.poster_id
-      
+      let _this = this      
+      if (_this.user_for === 0){
+        _this.user_for =  _this.post.poster_id
+      }
       _this.$axios.post('/api/v1/comment/add',
         { 'user_to': _this.user_for, 'comment': _this.comment_content,'post_id':Number(_this.id),"artical_id":0}
       ).then(function (res) {

@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-05-10 17:10:00
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-10 19:02:14
+ * @LastEditTime: 2020-05-23 13:39:17
  -->
 <template >
   <v-app id="inspire">
@@ -228,7 +228,7 @@ export default {
     rules: [
       value => value.length <= 5 || '图片限制5张',
     ],
-    rules_title: [v => (v && v.length <= 20 && v.length >= 5) || '字数限制20字且不少于5字',v =>v.split(" ").join("").length === v.length || '不含空格'],
+    rules_title: [v => (v && v.length <= 20 && v.length >= 5) || '字数限制20字且不少于5字',v =>((v && v.split(" ").join("").length === v.length)) || '不含空格'],
     rules_conetnt: [v => !!v, v => (v && v.length <= 200 && v.length >= 5) || '字数限制200字且不少于5字'],
     valid: true,
     title: '',
@@ -238,7 +238,7 @@ export default {
     headerImage: {},
     picValue: {},
     filelist: [],
-    text: '请登陆后才能发布帖子',
+    text: '请登录后才能发布帖子',
     snackbar: false,
     timeout: 2000,
     colorValue:'red lighten-2',
@@ -331,7 +331,7 @@ export default {
             }
           }).then(response => {
             _this.cursor = _this.cursor + _this.limit
-            // console.log(response.data.post_list)
+            // //console.log(response.data.post_list)
             // _this.post_items.push(response.data.post_list)
             for (let i in response.data.post_list) {
               if (response.data.post_list[i].post_id !== null) {
@@ -367,16 +367,16 @@ export default {
         if (errno !== 0) {
         }
         _this.has_more = res.data.has_more
-        // console.log(res.data.post_list)
+        // //console.log(res.data.post_list)
         for (let i in res.data.post_list) {
           _this.post_items.push(res.data.post_list[i])
         }
-        // console.log(_this.post_items)
+        // //console.log(_this.post_items)
       })
     },
     setTag(index){
       let _this = this
-      console.log(_this.items[index])
+      //console.log(_this.items[index])
       _this.post_tag = _this.items[index].tag
       _this.tag_name = _this.items[index].title
     }
@@ -386,7 +386,7 @@ export default {
       var pList = [];
       let _this = this
       _this.dialog = false
-      console.log(_this.filelist)
+      //console.log(_this.filelist)
       _this.send_dialog = true
       setTimeout(function (){
         for (let i = 0; i < _this.filelist.length; i++) {
@@ -397,7 +397,7 @@ export default {
       formData.append('title', _this.title)
       formData.append('content', _this.content)
       formData.append('tag', _this.post_tag)
-      console.log('formData', formData.getAll)
+      //console.log('formData', formData.getAll)
       setTimeout(function (){
         _this.$axios({
         url: '/api/v1/post/add',
