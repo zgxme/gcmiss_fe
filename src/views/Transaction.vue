@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-05-10 17:10:00
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-23 16:33:02
+ * @LastEditTime: 2020-05-24 13:56:18
  -->
 <template >
   <v-app id="inspire">
@@ -134,7 +134,7 @@
                 ></v-textarea>
               </v-col>
               <v-col
-                cols=4
+                cols=8
                 style="padding:0px"
               >
                 <v-text-field
@@ -244,11 +244,11 @@ export default {
     ],
     rules_title: [v => (v && v.length <= 20 && v.length >= 5) || '字数限制20字且不少于5字',v =>((v && v.split(" ").join("").length === v.length)) || '不含空格'],
     rules_conetnt: [v => !!v, v => (v && v.length <= 200 && v.length >= 5) || '字数限制200字且不少于5字'],
-    rules_price:[v => (!(v[0] === '0' && v.length >= 2)||(!v)) || '不符合金钱格式',v => ((v && v.length <= 8)||(!v)) || '字符限制不超过8位',v =>((v && v.split(" ").join("").length === v.length) ||(!v)) || '不含空格', v=> ((v && /^[0-9]*$/.test(v) || (!v)) || '仅包含数字')],
+    rules_price:[v => ((v && v.length <= 8)||(!v)) || '字符限制不超过8位',v =>((v && v.split(" ").join("").length === v.length) ||(!v)) || '不含空格', v=> ((v && /^[0-9]*$/.test(v) || (!v)) || '仅包含数字')],
     valid: true,
     title: '',
     content: '',
-    price: 0,
+    price: '0',
     files_num: 0,
     formData: {},
     headerImage: {},

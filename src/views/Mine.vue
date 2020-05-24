@@ -4,13 +4,33 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-04-05 14:18:07
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-23 13:32:33
+ * @LastEditTime: 2020-05-24 14:41:55
  -->
  <!--
  TODO flush error
  -->
 <template>
   <v-app id="Profile">
+    <v-dialog
+        v-model="send_dialog"
+        hide-overlay
+        persistent
+        width="300"
+      >
+        <v-card
+          color="primary"
+          dark
+        >
+          <v-card-text>
+            正在修改中,请稍后
+            <v-progress-linear
+              indeterminate
+              color="white"
+              class="mb-0"
+            ></v-progress-linear>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     <v-row>
       <v-col
         cols="12"
@@ -61,7 +81,7 @@
           max-width="750px"
           tile
         >
-        <v-form v-model="valid" ref="form" v-show="can_edit">
+        <v-form v-model="valid" ref="form" v-show="true">
         <v-card>
           <v-card-title>
           <span style="font-size:14px">设置个人资料</span>
@@ -341,10 +361,18 @@ export default {
  
   editProfile: function(){
     
+    },
+  watch: {
+    send_dialog (val) {
+      if (!val) return
+
+      setTimeout(() => (this.send_dialog = false), 2500)
+    },
   },
   methods:{
     InitData() {
       var _this = this
+      _this.filelist = []
       _this.id = _this.$store.state.current_id
       _this.$axios.get('/api/v1/user/get', { params: { user_id: _this.$store.state.current_id } }).then(function (res) {
         let errno = res.data.errno
@@ -361,7 +389,7 @@ export default {
         _this.profile_info = res.data.profile_info
       })
       if (_this.$store.state.current_id === _this.id){
-        // _this.set_avatar(_this.user_info.avatar_url)
+        _this.set_avatar(_this.user_info.avatar_url)
       }
     },
     setTag(index){
@@ -378,7 +406,7 @@ export default {
         promiseList.push(new Promise((resolve, reject) => {
           setTimeout(() => {
             this.view(files[i])
-          }, Math.random() * 3000);
+          }, Math.random() * 2000);
         }));
       }
       Promise.all(promiseList).then((rspList) => {
@@ -389,7 +417,12 @@ export default {
       if (typeof file === 'undefined') {
         return
       }
-      const res = await compressAccurately(file, 200)
+      const res = await compressAccurately(file, {
+        size:100,
+        accuracy: 0.95,
+        width: 360,
+        height: 200,
+      })
       await this.filelist.push(res)
     },
     postInfo() {
@@ -401,7 +434,7 @@ export default {
       _this.send_dialog = true
       setTimeout(function (){
         formData.append("avatar", _this.filelist[0])
-      },"1000");
+      },"2900");
       
       formData.append('name', _this.realname)
       formData.append('stu_id', _this.stu_num)
@@ -427,12 +460,15 @@ export default {
           _this.InitData()
         }
       })
-      },"1200");
+      },"3000");
       
       _this.$refs.form.reset()
       _this.$refs.form.resetValidation()
       _this.valid = true
-    }
+    },
+    set_avatar(value){
+      this.$store.commit('set_avatar',value)
+    },
     
   }
 

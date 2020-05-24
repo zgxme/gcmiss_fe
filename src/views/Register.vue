@@ -11,7 +11,7 @@
           dark
         >
           <v-card-text>
-            正在注册中,请稍等
+            正在注册中,请关注邮箱
             <v-progress-linear
               indeterminate
               color="white"
@@ -163,9 +163,9 @@ export default {
       snackbar_register: false,
       text: '该用户名已经被注册',
       text_err: '该邮箱已经被注册',
-      text_register:'正在注册中,请稍等',
+      text_register:'正在注册中,请关注邮箱',
       send_dialog:false,
-      timeout: 2000,
+      timeout: 3500,
       colorValue:'red lighten-2',
       rules: {
         nameRules: [

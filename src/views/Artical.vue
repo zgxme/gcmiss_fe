@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-04-05 00:37:35
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-23 22:19:39
+ * @LastEditTime: 2020-05-24 13:57:43
  -->
 <template>
   <v-app id="Post">
@@ -299,7 +299,7 @@ export default {
     rules_title: [v => (v && v.length <= 20 && v.length >= 5) || '字数限制20字且不少于5字',v =>((v && v.split(" ").join("").length === v.length)) || '不含空格'],
     rules_comment: [v => (v && v.length <= 50 && v.length >= 5) || '字数限制50字且不少于5字',v =>((v && v.split(" ").join("").length === v.length)) || '不含空格'],
     rules_conetnt: [v => !v, v => (v && v.length <= 200 && v.length >= 5) || '字数限制200字且不少于5字'],
-    rules_price:[v => (!(v[0] === '0' && v.length >= 2)||(!v)) || '不符合金钱格式',v => ((v && v.length <= 8)||(!v)) || '字符限制不超过8位',v =>((v && v.split(" ").join("").length === v.length) ||(!v)) || '不含空格', v=> ((v && /^[0-9]*$/.test(v) || (!v)) || '仅包含数字')],
+    rules_price:[v => ((v && v.length <= 8)||(!v)) || '字符限制不超过8位',v =>((v && v.split(" ").join("").length === v.length) ||(!v)) || '不含空格', v=> ((v && /^[0-9]*$/.test(v) || (!v)) || '仅包含数字')],
 
   }),
 

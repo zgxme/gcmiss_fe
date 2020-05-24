@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2020-04-05 14:18:07
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-24 11:51:52
+ * @LastEditTime: 2020-05-24 13:07:50
  -->
 <template>
   <v-app id="Profile">
@@ -428,7 +428,7 @@ export default {
         _this.profile_info = res.data.profile_info
       })
       if (_this.$store.state.current_id === _this.id){
-        _this.set_avatar(user_info.avatar_url)
+        _this.set_avatar(_this.user_info.avatar_url)
       }
     },
     setTag(index){
@@ -456,7 +456,12 @@ export default {
       if (typeof file === 'undefined') {
         return
       }
-      const res = await compressAccurately(file, 100)
+      const res = await compressAccurately(file, {
+        size:100,
+        accuracy: 0.95,
+        width: 360,
+        height: 200,
+      })
       await this.filelist.push(res)
     },
     postInfo() {
@@ -468,7 +473,7 @@ export default {
       _this.send_dialog = true
       setTimeout(function (){
         formData.append("avatar", _this.filelist[0])
-      },"1900");
+      },"2900");
       
       formData.append('name', _this.realname)
       formData.append('stu_id', _this.stu_num)
@@ -494,11 +499,14 @@ export default {
           _this.InitData()
         }
       })
-      },"2000");
+      },"3000");
       
       _this.$refs.form.reset()
       _this.$refs.form.resetValidation()
       _this.valid = true
+    },
+    set_avatar(value){
+      this.$store.commit('set_avatar',value)
     },
     deleteUser(){
       let _this = this      
