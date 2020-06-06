@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2019-12-16 23:20:22
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-24 12:31:31
+ * @LastEditTime: 2020-06-02 12:17:52
  */
 import Vue from 'vue'
 import App from './App.vue'
@@ -19,8 +19,8 @@ import vuetify from './plugins/vuetify'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 Vue.config.productionTip = true
 axios.defaults.withCredentials = true
-// axios.defaults.baseURL = 'http://39.105.160.133:80/'
-axios.defaults.baseURL = 'http://192.168.1.9:8081/'
+axios.defaults.baseURL = 'http://www.zhitiaosay.com/'
+// axios.defaults.baseURL = 'http://192.168.1.9:8081/'
 
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 Vue.prototype.$axios = axios

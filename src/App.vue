@@ -4,7 +4,7 @@
  * @Author: Zheng Gaoxiong
  * @Date: 2019-12-16 23:20:22
  * @LastEditors: Zheng Gaoxiong
- * @LastEditTime: 2020-05-23 16:34:42
+ * @LastEditTime: 2020-06-06 20:02:54
  -->
 <template>
   <v-app id="inspire">
@@ -169,7 +169,9 @@
     </v-content>
 
     <v-footer app>
+      <div>
         <span style="font-size:10px">2020 Copyright. All Rights Reserved. :) purifiedzheng@gmail.com</span>
+      </div>
     </v-footer>
   </v-app>
 
